@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme inline {
+    --font-serif: var(--font-serif);
+    --font-sans: var(--font-sans);
+    --font-script: var(--font-script);
+
+    --color-ivory: #FFFFF0;
+    --color-cream: #FDFBF7;
+    --color-beige: #F5F5DC;
+    --color-champagne: #F7E7CE;
+    --color-gold: #D4AF37;
+    --color-gold-light: #E5C56C;
+    --color-charcoal: #1A1A1A;
+}
+
+@layer base {
+    body {
+        @apply bg-ivory text-charcoal font-sans antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-serif;
+    }
+}
+
+@layer components {
+    .container {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .btn-primary {
+        @apply px-8 py-3 bg-charcoal text-white font-medium hover:bg-gold hover:text-charcoal transition-all duration-300 uppercase tracking-widest text-sm;
+    }
+
+    .btn-secondary {
+        @apply px-8 py-3 border border-charcoal text-charcoal font-medium hover:bg-charcoal hover:text-white transition-all duration-300 uppercase tracking-widest text-sm;
+    }
+}
