@@ -1,0 +1,299 @@
+.home {
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-4xl) var(--container-padding);
+    background: linear-gradient(135deg, var(--color-ivory) 0%, var(--color-beige) 100%);
+    position: relative;
+}
+
+.hero__content {
+    max-width: 900px;
+    margin: 0 auto var(--spacing-3xl);
+}
+
+.hero__title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.1;
+}
+
+.hero__subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-2xl);
+    line-height: 1.8;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero__cta {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero__trust {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+    max-width: 1000px;
+    width: 100%;
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.trust-badge__icon {
+    font-size: var(--font-size-2xl);
+}
+
+.trust-badge__text {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* Sections */
+.section {
+    padding: var(--spacing-4xl) 0;
+}
+
+.section__header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section__title {
+    margin-bottom: var(--spacing-md);
+}
+
+.section__subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.section__cta {
+    text-align: center;
+    margin-top: var(--spacing-3xl);
+}
+
+/* Collections Grid */
+.collections__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+.collection-card {
+    min-height: 300px;
+    padding: var(--spacing-2xl);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.collection-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, var(--color-soft-gold) 100%);
+    opacity: 0;
+    transition: var(--transition-base);
+}
+
+.collection-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.collection-card:hover::before {
+    opacity: 0.1;
+}
+
+.collection-card__content {
+    position: relative;
+    z-index: 1;
+}
+
+.collection-card__title {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-primary);
+}
+
+.collection-card__description {
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.collection-card__link {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-champagne);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: inline-block;
+    transition: var(--transition-base);
+}
+
+.collection-card:hover .collection-card__link {
+    transform: translateX(8px);
+}
+
+/* Products Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-2xl);
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Brand Story */
+.brand-story {
+    background: var(--color-beige);
+}
+
+.brand-story__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-4xl);
+    align-items: center;
+}
+
+@media (max-width: 968px) {
+    .brand-story__content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-2xl);
+    }
+}
+
+.brand-story__text p {
+    margin-bottom: var(--spacing-lg);
+}
+
+.brand-story__image {
+    aspect-ratio: 4/3;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.brand-story__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-soft-gold) 0%, var(--color-champagne) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    color: var(--color-white);
+}
+
+.brand-story__placeholder span {
+    font-size: 4rem;
+}
+
+.brand-story__placeholder p {
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+}
+
+/* Instagram */
+.instagram__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .instagram__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.instagram__card {
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.instagram__card:hover {
+    transform: scale(1.05);
+}
+
+.instagram__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--color-beige);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        min-height: auto;
+        padding: var(--spacing-3xl) var(--container-padding);
+    }
+
+    .hero__trust {
+        grid-template-columns: 1fr;
+    }
+
+    .trust-badge {
+        justify-content: center;
+    }
+
+    .collections__grid {
+        grid-template-columns: 1fr;
+    }
+}

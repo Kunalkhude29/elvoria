@@ -1,0 +1,209 @@
+.checkout {
+    padding: var(--spacing-3xl) 0;
+    min-height: 80vh;
+    background: var(--color-beige);
+}
+
+.checkout__title {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.checkout__grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: var(--spacing-3xl);
+}
+
+@media (max-width: 968px) {
+    .checkout__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Form */
+.checkout__form {
+    background: var(--color-surface);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-2xl);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section__title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    transition: var(--transition-base);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-champagne);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* Payment Methods */
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.payment-option:hover {
+    border-color: var(--color-champagne);
+    background: var(--color-beige);
+}
+
+.payment-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.payment-option span {
+    font-weight: 500;
+}
+
+/* Summary */
+.checkout__summary {
+    position: sticky;
+    top: calc(var(--header-height) + var(--spacing-xl));
+    height: fit-content;
+    background: var(--color-surface);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 968px) {
+    .checkout__summary {
+        position: static;
+    }
+}
+
+.summary__title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.summary__items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.summary-item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.summary-item img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.summary-item__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.summary-item__name {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.summary-item__qty,
+.summary-item__size {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.summary-item__price {
+    font-weight: 600;
+    color: var(--color-champagne);
+}
+
+.summary__row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    color: var(--color-text-secondary);
+}
+
+.summary__free {
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.summary__total {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    padding: var(--spacing-lg) 0;
+}
+
+.summary__security {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+}
+
+.summary__security p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}

@@ -1,0 +1,300 @@
+.product-detail {
+    padding: var(--spacing-3xl) 0;
+    min-height: 80vh;
+}
+
+.product-detail__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-4xl);
+    margin-bottom: var(--spacing-4xl);
+}
+
+@media (max-width: 968px) {
+    .product-detail__grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-2xl);
+    }
+}
+
+/* Gallery */
+.product-detail__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.gallery__main {
+    aspect-ratio: 3/4;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-beige);
+}
+
+.gallery__main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+    transition: var(--transition-slow);
+}
+
+.gallery__main-image:hover {
+    transform: scale(1.05);
+}
+
+.gallery__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.gallery__thumbnail {
+    aspect-ratio: 3/4;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-base);
+    padding: 0;
+    background: var(--color-beige);
+}
+
+.gallery__thumbnail:hover {
+    border-color: var(--color-champagne);
+}
+
+.gallery__thumbnail--active {
+    border-color: var(--color-champagne);
+}
+
+.gallery__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Product Info */
+.product-detail__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.product-detail__header {
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.product-detail__title {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.product-detail__material {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-md);
+}
+
+.product-detail__price {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-champagne);
+    margin-top: var(--spacing-md);
+}
+
+/* Meta */
+.product-detail__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.meta-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+}
+
+.meta-label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.meta-value {
+    color: var(--color-text-secondary);
+}
+
+/* Sizes */
+.product-detail__sizes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.sizes__label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.sizes__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.size-option {
+    min-width: 60px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.size-option:hover {
+    border-color: var(--color-champagne);
+}
+
+.size-option--active {
+    border-color: var(--color-champagne);
+    background: var(--color-soft-gold);
+    color: var(--color-champagne);
+}
+
+/* Quantity */
+.product-detail__quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.quantity__label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.quantity__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs);
+}
+
+.quantity__btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    font-size: var(--font-size-xl);
+    cursor: pointer;
+    color: var(--color-text-primary);
+    transition: var(--transition-base);
+}
+
+.quantity__btn:hover {
+    color: var(--color-champagne);
+}
+
+.quantity__value {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Actions */
+.product-detail__actions {
+    display: flex;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+}
+
+@media (max-width: 640px) {
+    .product-detail__actions {
+        flex-direction: column;
+    }
+}
+
+/* Description */
+.product-detail__description {
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+}
+
+.product-detail__description h3 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.product-detail__description p {
+    line-height: 1.8;
+}
+
+/* Accordion */
+.product-detail__accordion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.accordion-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.accordion-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: var(--transition-base);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accordion-header::-webkit-details-marker {
+    display: none;
+}
+
+.accordion-header::after {
+    content: '+';
+    font-size: var(--font-size-xl);
+    color: var(--color-champagne);
+    transition: var(--transition-base);
+}
+
+.accordion-item[open] .accordion-header::after {
+    content: '−';
+}
+
+.accordion-header:hover {
+    background: var(--color-beige);
+}
+
+.accordion-content {
+    padding: 0 var(--spacing-lg) var(--spacing-md);
+    color: var(--color-text-secondary);
+}
+
+/* Related Products */
+.product-detail__related {
+    padding-top: var(--spacing-4xl);
+    border-top: 1px solid var(--color-border);
+}
+
+.product-detail__related .section__title {
+    margin-bottom: var(--spacing-2xl);
+    text-align: center;
+}

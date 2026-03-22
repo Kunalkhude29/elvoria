@@ -1,0 +1,106 @@
+.btn {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: var(--font-size-sm);
+    outline: none;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--color-champagne);
+    outline-offset: 2px;
+}
+
+/* Variants */
+.btn--primary {
+    background: var(--color-charcoal);
+    color: var(--color-white);
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.btn--primary:hover:not(.btn--disabled) {
+    background: var(--color-champagne);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn--secondary {
+    background: transparent;
+    color: var(--color-charcoal);
+    border: 1.5px solid var(--color-charcoal);
+    padding: calc(var(--spacing-md) - 1.5px) calc(var(--spacing-xl) - 1.5px);
+}
+
+.btn--secondary:hover:not(.btn--disabled) {
+    background: var(--color-charcoal);
+    color: var(--color-white);
+    transform: translateY(-2px);
+}
+
+.btn--gold {
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-champagne) 100%);
+    color: var(--color-white);
+    padding: var(--spacing-md) var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn--gold:hover:not(.btn--disabled) {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.btn--ghost:hover:not(.btn--disabled) {
+    color: var(--color-champagne);
+}
+
+/* Sizes */
+.btn--small {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+}
+
+.btn--medium {
+    /* Default size - already set in variants */
+}
+
+.btn--large {
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    font-size: var(--font-size-base);
+}
+
+/* States */
+.btn--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn--full-width {
+    width: 100%;
+}
+
+/* Icon */
+.btn__icon {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+}
+
+.btn__text {
+    display: flex;
+    align-items: center;
+}
