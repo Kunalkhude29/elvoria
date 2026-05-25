@@ -1,0 +1,13 @@
+{
+  "name": "shweta",
+  "version": "1.0.0",
+  "description": "Root project for SHWETA (Frontend + Backend)",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"NEXT,NODE\" -c \"cyan,magenta\" --kill-others \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,183 @@
+const prisma = require('../lib/prisma');
+
+const formatProduct = (product) => {
+    if (!product) return product;
+
+    // Safely extract the first image
+    let defaultImage = null;
+    if (Array.isArray(product.images) && product.images.length > 0) {
+        defaultImage = product.images[0];
+    } else if (typeof product.images === 'string' && product.images !== '') {
+        defaultImage = product.images;
+    }
+
+    return {
+        ...product,
+        id: product.id ? product.id.toString() : undefined,
+        price: Number(product.price),
+        image: defaultImage,
+        category: product.category ? product.category.name : 'Uncategorized',
+        collection: product.collection ? product.collection.name : null,
+    };
+};
+
+// @desc    Fetch all products
+// @route   GET /api/products
+// @access  Public
+const getProducts = async (req, res) => {
+    const { category, collection, featured, limit, page } = req.query;
+    const where = {};
+
+    if (category) where.category = { name: category };
+    if (collection) where.collection = { name: collection };
+    // if (featured) where.featured = true;
+
+    const take = limit ? parseInt(limit) : undefined;
+    const skip = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
+
+    try {
+        // Optimization: Select only required fields for list view (exclude description)
+        const products = await prisma.product.findMany({
+            where,
+            take,
+            skip,
+            select: {
+                id: true,
+                name: true,
+                price: true,
+                images: true,
+                stock: true,
+                categoryId: true,
+                collectionId: true,
+                category: { select: { name: true } },
+                collection: { select: { name: true } },
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // Add Cache-Control header for better performance (1 minute)
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json(products.map(formatProduct));
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Fetch all categories
+// @route   GET /api/products/categories
+// @access  Public
+const getCategories = async (req, res) => {
+    try {
+        const categories = await prisma.category.findMany();
+        res.json(categories);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Fetch single product
+// @route   GET /api/products/:id
+// @access  Public
+const getProductById = async (req, res) => {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id: Number(req.params.id) },
+            include: { 
+                category: { select: { id: true, name: true } }, 
+                collection: { select: { id: true, name: true } } 
+            },
+        });
+
+        if (product) {
+            // Add Cache-Control header for product details (1 minute)
+            // This makes the Product Detail Page feel nearly instant on returning visits
+            res.set('Cache-Control', 'public, max-age=60');
+            res.json(formatProduct(product));
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Create a product
+// @route   POST /api/products
+// @access  Private/Admin
+const createProduct = async (req, res) => {
+    const { name, price, description, categoryId, collectionId, stock, images } = req.body;
+    // req.files would handle create with images, simplified here
+
+    try {
+        const product = await prisma.product.create({
+            data: {
+                name,
+                price: Number(price),
+                description,
+                categoryId: Number(categoryId), // assuming ID passed
+                collectionId: collectionId ? Number(collectionId) : null,
+                stock: Number(stock),
+                images: images || [], // Save image payload or default empty
+            },
+        });
+        res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Product creation failed: ' + error.message });
+    }
+};
+
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+const updateProduct = async (req, res) => {
+    const { name, price, description, categoryId, collectionId, stock, images } = req.body;
+
+    try {
+        const updateData = {
+            name,
+            price: Number(price),
+            description,
+            categoryId: Number(categoryId),
+            collectionId: collectionId ? Number(collectionId) : null,
+            stock: Number(stock),
+        };
+
+        if (images && Array.isArray(images) && images.length > 0) {
+            updateData.images = images;
+        }
+
+        const product = await prisma.product.update({
+            where: { id: Number(req.params.id) },
+            data: updateData,
+        });
+        res.json(product);
+    } catch (error) {
+        res.status(404).json({ message: 'Product not found or update failed: ' + error.message });
+    }
+};
+
+// @desc    Delete a product
+// @route   DELETE /api/products/:id
+// @access  Private/Admin
+const deleteProduct = async (req, res) => {
+    try {
+        await prisma.product.delete({
+            where: { id: Number(req.params.id) },
+        });
+        res.json({ message: 'Product removed' });
+    } catch (error) {
+        if (error.code === 'P2003') {
+            return res.status(400).json({ message: 'Cannot delete product: It is associated with existing orders. You may update its stock to 0 instead.' });
+        }
+        res.status(404).json({ message: 'Product not found or could not be deleted.' });
+    }
+};
+
+module.exports = {
+    getProducts,
+    getCategories,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+};

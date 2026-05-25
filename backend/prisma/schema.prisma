@@ -1,0 +1,165 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+
+
+}
+
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+
+
+}
+
+model Profile {
+  id             String    @id @db.Uuid
+  email          String?   @unique
+  firstName      String?
+  lastName       String?
+  phone          String?
+  receivesOffers Boolean   @default(false)
+  role           Role      @default(USER)
+  orders         Order[]
+  addresses      Address[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("profiles")
+
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  image     String?   // URL to icon/image
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+
+}
+
+model Collection {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  heroImage   String?   // URL for collection hero
+  isActive    Boolean   @default(true)
+  products    Product[]
+  banners     CollectionBanner[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+
+}
+
+model Product {
+  id           Int         @id @default(autoincrement())
+  name         String
+  description  String
+  price        Decimal
+  stock        Int         @default(0)
+  images       Json        // Array of image URLs
+  categoryId   Int?
+  collectionId Int?
+  category     Category?   @relation(fields: [categoryId], references: [id])
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  userId        String?   @db.Uuid
+  user          Profile?  @relation(fields: [userId], references: [id])
+  customerName  String?
+  customerPhone String?
+  customerEmail String?
+  shippingAddress String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+  status              OrderStatus @default(PENDING)
+  total               Decimal
+  paymentMethod       String?     // "UPI" | "COD"
+  paymentStatus       String?     // "Paid" | "Pending" | "Failed"
+  razorpayPaymentId   String?
+  items               OrderItem[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal // Price at time of purchase
+
+
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  userId      String    @db.Uuid
+  user        Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName   String
+  lastName    String
+  address     String
+  apartment   String?
+  city        String
+  state       String
+  pinCode     String
+  country     String   @default("India")
+  phone       String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+
+}
+
+model CollectionBanner {
+  id           Int        @id @default(autoincrement())
+  collectionId Int
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  image        String
+  title        String?
+  subtitle     String?
+  offerText    String?
+  ctaText      String?
+  displayOrder Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}

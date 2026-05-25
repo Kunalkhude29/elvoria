@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Primary font: Archivo Narrow ──────────────────────────────── */
+  /* All three aliases map to the same CSS variable so every
+     font-outfit / font-inter / font-dm-mono utility class
+     automatically renders in Archivo Narrow. */
+  --font-archivo: var(--font-archivo), 'Archivo Narrow', sans-serif;
+  --font-outfit:  var(--font-archivo), 'Archivo Narrow', sans-serif;
+  --font-inter:   var(--font-archivo), 'Archivo Narrow', sans-serif;
+  --font-dm-mono: var(--font-archivo), 'Archivo Narrow', sans-serif;
+
+  /* Colors */
+  --color-ivory: #ffffff;
+  --color-cream: #ffffff;
+  --color-beige: #f9fafb;
+  --color-champagne: #f3f4f6;
+  --color-gold: #D4AF37;
+  --color-gold-light: #F4DF4E;
+  --color-charcoal: #111827;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-white);
+    color: var(--color-charcoal);
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+    font-weight: 400; /* Regular by default */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings use SemiBold (600) */
+  h1, h2, h3 {
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+    font-weight: 600;
+  }
+
+  /* Sub-headings use Medium (500) */
+  h4, h5, h6 {
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+    font-weight: 500;
+  }
+
+  /* UI controls use Medium (500) */
+  button, label, nav, input, select, textarea {
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+    font-weight: 500;
+  }
+
+  /* Paragraphs and body text use Regular (400) */
+  p, span, li, td, th {
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  .main-container {
+    width: 100%;
+    max-width: 2400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .main-container {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  .btn-primary {
+    @apply px-8 py-3 rounded-full bg-charcoal text-white font-semibold hover:bg-gold hover:text-white transition-all duration-300 uppercase tracking-widest text-sm;
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-3 rounded-full border border-charcoal text-charcoal font-semibold hover:bg-charcoal hover:text-white transition-all duration-300 uppercase tracking-widest text-sm;
+    font-family: var(--font-archivo), 'Archivo Narrow', sans-serif;
+  }
+}
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

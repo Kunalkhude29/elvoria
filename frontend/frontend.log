@@ -1,0 +1,55 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/kunalkhude/Downloads/elvoria-elvoriacode/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/kunalkhude/Downloads/elvoria-elvoriacode/frontend/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.34:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 316ms
+Image with src "/images/banner_right_v2.png" is using quality "100" which is not configured in images.qualities [75]. Please update your config to [100, 75].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 1249ms (compile: 1145ms, render: 103ms)
+ GET /men 200 in 4.8s (compile: 407ms, render: 4.4s)
+ GET /shop 200 in 2.4s (compile: 8ms, render: 2.4s)
+ GET / 200 in 20ms (compile: 6ms, render: 14ms)
+✓ Compiled in 62ms
+✓ Compiled in 13ms
+ GET / 200 in 63ms (compile: 30ms, render: 33ms)
+ GET / 200 in 63ms (compile: 55ms, render: 7ms)
+ GET /admin/products 200 in 311ms (compile: 246ms, render: 64ms)
+ GET / 200 in 66ms (compile: 35ms, render: 31ms)
+Image with src "/images/banner_right_v2.png" is using quality "100" which is not configured in images.qualities [75]. Please update your config to [100, 75].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 77ms (compile: 1326µs, render: 75ms)
+✓ Compiled in 29ms
+ GET / 200 in 102ms (compile: 36ms, render: 65ms)
+ GET / 200 in 17ms (compile: 1651µs, render: 16ms)
+ GET / 200 in 17ms (compile: 10ms, render: 7ms)
+ GET / 200 in 67ms (compile: 39ms, render: 28ms)
+Image with src "/images/banner_right_v2.png" is using quality "100" which is not configured in images.qualities [75]. Please update your config to [100, 75].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 86ms (compile: 3ms, render: 83ms)
+✓ Compiled in 26ms
+ GET / 200 in 74ms (compile: 30ms, render: 44ms)
+ GET / 200 in 22ms (compile: 1050µs, render: 20ms)
+ GET / 200 in 22ms (compile: 11ms, render: 11ms)
+ GET / 200 in 105ms (compile: 94ms, render: 11ms)
+ GET / 200 in 101ms (compile: 70ms, render: 31ms)
+ GET / 200 in 101ms (compile: 34ms, render: 67ms)
+Image with src "/images/banner_right_v2.png" is using quality "100" which is not configured in images.qualities [75]. Please update your config to [100, 75].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 101ms (compile: 2ms, render: 98ms)
+ GET / 200 in 45ms (compile: 22ms, render: 22ms)
+Image with src "/images/banner_right_v2.png" is using quality "100" which is not configured in images.qualities [75]. Please update your config to [100, 75].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 54ms (compile: 976µs, render: 53ms)
