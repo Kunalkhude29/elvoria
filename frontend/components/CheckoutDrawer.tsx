@@ -26,6 +26,7 @@ import {
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { fetchPincodeDetails } from '@/lib/pincode';
 
 export default function CheckoutDrawer() {
     const { isCheckoutOpen, closeCheckout } = useCheckout();
@@ -154,26 +155,19 @@ export default function CheckoutDrawer() {
         setFormData(prev => ({ ...prev, pinCode: value }));
 
         if (value.length === 6) {
-            try {
-                const res = await fetch(`https://api.postalpincode.in/pincode/${value}`);
-                const data = await res.json();
-                if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length > 0) {
-                    const postOffice = data[0].PostOffice[0];
-                    setFormData(prev => ({
-                        ...prev,
-                        city: postOffice.District,
-                        state: postOffice.State
-                    }));
-                } else {
-                    setFormData(prev => ({
-                        ...prev,
-                        city: '',
-                        state: ''
-                    }));
-                    // Optional: show a small toast or inline error instead of alert for better UX, but we rely on backend validation too.
-                }
-            } catch (error) {
-                console.error("Error fetching pincode details", error);
+            const details = await fetchPincodeDetails(value);
+            if (details.isValid) {
+                setFormData(prev => ({
+                    ...prev,
+                    city: details.city || '',
+                    state: details.state || ''
+                }));
+            } else {
+                setFormData(prev => ({
+                    ...prev,
+                    city: '',
+                    state: ''
+                }));
             }
         }
     };

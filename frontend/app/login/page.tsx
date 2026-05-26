@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, ArrowRight, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function LoginPage() {
+function LoginPageContent() {
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [step, setStep] = useState<'email' | 'otp'>('email');
@@ -171,3 +171,19 @@ export default function LoginPage() {
         </div>
     );
 }
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#fcfaf7] flex items-center justify-center p-4 md:p-6 font-outfit">
+                <div className="w-full max-w-md bg-white p-10 rounded-[40px] shadow-[0_20px_60px_rgba(42,32,18,0.05)] border border-[#e8e1d7] flex flex-col items-center justify-center min-h-[300px]">
+                    <Loader2 className="w-8 h-8 animate-spin text-charcoal/40 mb-4" />
+                    <p className="text-charcoal/50 text-[15px]">Loading login portal...</p>
+                </div>
+            </div>
+        }>
+            <LoginPageContent />
+        </Suspense>
+    );
+}
+

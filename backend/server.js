@@ -49,6 +49,7 @@ const collectionRoutes = require('./routes/collectionRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const pincodeRoutes = require('./routes/pincodeRoutes');
 const path = require('path');
 
 app.use('/api/auth', authRoutes);
@@ -60,6 +61,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/pincode', pincodeRoutes);
 
 // Make uploads folder manually accessible statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

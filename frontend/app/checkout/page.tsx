@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -43,7 +43,7 @@ const initialFormState: CheckoutFormState = {
     country: 'India',
 };
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const isEditing = searchParams.get('edit') === 'true';
@@ -604,5 +604,23 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-background">
+                <Navbar />
+                <div className="main-container pt-32 pb-20">
+                    <div className="space-y-5 rounded-[28px] border border-[#e8e1d7] bg-white/90 p-8 shadow-[0_20px_60px_rgba(42,32,18,0.06)] animate-pulse flex flex-col items-center justify-center min-h-[300px]">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#dfd4c4] border-t-[#b9955c] mb-4" />
+                        <p className="text-charcoal/50 text-[15px]">Loading checkout details...</p>
+                    </div>
+                </div>
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }
