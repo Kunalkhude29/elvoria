@@ -1,15 +1,34 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 
 const CURATED_ITEMS = [
-    { name: 'Wedding', image: '/images/product-3.png', href: '/wedding' },
-    { name: 'Daily Wear', image: '/images/product-1.png', href: '/daily-wear' },
-    { name: 'Gifting', image: '/images/product-2.png', href: '/gifting' }
+    { key: 'wedding',    name: 'Wedding',    defaultImage: '/images/product-3.png', href: '/wedding' },
+    { key: 'daily-wear', name: 'Daily Wear', defaultImage: '/images/product-1.png', href: '/daily-wear' },
+    { key: 'gifting',    name: 'Gifting',    defaultImage: '/images/product-2.png', href: '/gifting' },
 ];
 
-export default function CuratedSection() {
+async function getCuratedImages(): Promise<Record<string, string>> {
+    try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+        const res = await fetch(`${apiUrl}/api/homepage-images`, { next: { revalidate: 60 } });
+        if (!res.ok) return {};
+        const data: { key: string; image: string }[] = await res.json();
+        const map: Record<string, string> = {};
+        data.forEach(d => { map[d.key] = d.image; });
+        return map;
+    } catch {
+        return {};
+    }
+}
+
+export default async function CuratedSection() {
+    const dbImages = await getCuratedImages();
+
+    const items = CURATED_ITEMS.map(item => ({
+        ...item,
+        image: dbImages[item.key] || item.defaultImage,
+    }));
+
     return (
         <section className="w-full pt-6 md:pt-10 pb-4">
             <div className="main-container">
@@ -22,29 +41,31 @@ export default function CuratedSection() {
                 {/* Mobile-only Layout */}
                 <div className="flex flex-col gap-4 md:hidden">
                     {/* 1st Card: Full-width Horizontal Banner */}
-                    <Link href={CURATED_ITEMS[0].href} className="group relative h-[180px] overflow-hidden block rounded-[10px]">
+                    <Link href={items[0].href} className="group relative h-[180px] overflow-hidden block rounded-[10px]">
                         <Image
-                            src={CURATED_ITEMS[0].image}
-                            alt={CURATED_ITEMS[0].name}
+                            src={items[0].image}
+                            alt={items[0].name}
                             fill
+                            unoptimized={items[0].image.startsWith('http')}
                             className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-80" />
                         <div className="absolute bottom-4 left-4 text-white">
-                            <h3 className="text-xl font-outfit tracking-[0.15em] uppercase">{CURATED_ITEMS[0].name}</h3>
-                            <span className="text-[10px] font-outfit font-semibold uppercase tracking-[0.2em] border-b border-white pb-0.5 block w-fit mt-1">Shop Now</span>
+                            <h3 className="text-xl font-outfit tracking-[0.15em] uppercase">{items[0].name}</h3>
+                            <span className="text-[10px] font-outfit font-semibold uppercase tracking-[0.2em] block w-fit mt-1">Shop Now</span>
                         </div>
                     </Link>
 
                     {/* 2nd & 3rd Cards: Side-by-side vertical cards */}
                     <div className="grid grid-cols-2 gap-4">
-                        {[CURATED_ITEMS[1], CURATED_ITEMS[2]].map((item) => (
+                        {[items[1], items[2]].map((item) => (
                             <Link key={item.name} href={item.href} className="group flex flex-col bg-[#f5f4f0] rounded-[10px] overflow-hidden">
                                 <div className="relative aspect-[1.05] w-full overflow-hidden bg-gray-100">
                                     <Image
                                         src={item.image}
                                         alt={item.name}
                                         fill
+                                        unoptimized={item.image.startsWith('http')}
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                 </div>
@@ -64,19 +85,22 @@ export default function CuratedSection() {
 
                 {/* Desktop-only Layout */}
                 <div className="hidden md:grid md:grid-cols-3 gap-6">
-                    {CURATED_ITEMS.map((item) => (
+                    {items.map((item) => (
                         <Link key={item.name} href={item.href} className="group relative h-[400px] overflow-hidden block rounded-[10px]">
                             <Image
                                 src={item.image}
                                 alt={item.name}
                                 fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                unoptimized={item.image.startsWith('http')}
+                                className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+                                    item.key === 'wedding' ? 'object-[30%_center]' : 'object-center'
+                                }`}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
 
                             <div className="absolute bottom-6 left-6 text-white">
                                 <h3 className="text-2xl font-outfit tracking-[0.15em] uppercase group-hover:translate-x-2 transition-transform duration-300">{item.name}</h3>
-                                <span className="text-xs font-outfit font-semibold uppercase tracking-[0.2em] border-b border-white pb-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 block w-fit mt-1">Shop Now</span>
+                                <span className="text-xs font-outfit font-semibold uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 block w-fit mt-1">Shop Now</span>
                             </div>
                         </Link>
                     ))}

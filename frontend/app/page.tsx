@@ -1,11 +1,10 @@
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import CategoryRow from '../components/CategoryRow';
+import CuratedSection from '../components/CuratedSection';
 import dynamic from 'next/dynamic';
 
 // Lazy load below-the-fold components with NO SSR for maximum initial speed
-// This ensures their JS/Rendering doesn't compete with the Hero banner's FCP
-const CuratedSection = dynamic(() => import('../components/CuratedSection'));
 const TrendingSection = dynamic(() => import('../components/TrendingSection'));
 const CustomerReviews = dynamic(() => import('../components/CustomerReviews'));
 

@@ -10,6 +10,7 @@ import Navbar from './Navbar';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { cloudinaryUrl, isCloudinaryUrl } from '@/lib/cloudinary';
+import ProductCard from './ProductCard';
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
     const [PRODUCT, setProduct] = useState<any>(initialProduct);
@@ -196,25 +197,66 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
                 {/* Image Gallery */}
                 <div className="space-y-4">
-                    <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden rounded-sm">
+                    <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden rounded-sm touch-pan-y">
                         {displayImages.length > 0 ? (
-                            <>
-                                {console.log(`[ProductDetailPage] product ID ${PRODUCT.id} main image URL:`, cloudinaryUrl(displayImages[selectedImage]))}
-                                <Image
-                                    src={cloudinaryUrl(displayImages[selectedImage])}
-                                    alt={PRODUCT.name}
-                                    fill
-                                    priority // High priority for the main product image
-                                    unoptimized={!isCloudinaryUrl(displayImages[selectedImage])}
-                                    className="object-cover"
-                                />
-                            </>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={selectedImage}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.2 }}
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={0.2}
+                                    onDragEnd={(e, { offset, velocity }) => {
+                                        const swipeDistance = offset.x;
+                                        const swipeVelocity = velocity.x;
+                                        
+                                        if (swipeDistance < -50 || swipeVelocity < -500) {
+                                            if (displayImages.length > 1) {
+                                                setSelectedImage(prev => (prev === displayImages.length - 1 ? 0 : prev + 1));
+                                            }
+                                        } else if (swipeDistance > 50 || swipeVelocity > 500) {
+                                            if (displayImages.length > 1) {
+                                                setSelectedImage(prev => (prev === 0 ? displayImages.length - 1 : prev - 1));
+                                            }
+                                        }
+                                    }}
+                                    className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                                >
+                                    <Image
+                                        src={cloudinaryUrl(displayImages[selectedImage])}
+                                        alt={PRODUCT.name}
+                                        fill
+                                        priority
+                                        unoptimized={!isCloudinaryUrl(displayImages[selectedImage])}
+                                        className="object-cover pointer-events-none"
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-charcoal/40 bg-gray-200 uppercase tracking-widest text-sm font-medium">
                                 No Image Available
                             </div>
                         )}
                     </div>
+                    
+                    {/* Pagination Dots (Mobile/Tablet) */}
+                    {displayImages.length > 1 && (
+                        <div className="flex justify-center gap-2 mt-4 md:hidden">
+                            {displayImages.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setSelectedImage(idx)}
+                                    className={`w-2 h-2 rounded-full transition-colors ${selectedImage === idx ? 'bg-charcoal' : 'bg-gray-300'}`}
+                                    aria-label={`Go to image ${idx + 1}`}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Thumbnail Strip (Desktop/Tablet) */}
                     {displayImages.length > 1 && (
                         <div className="flex space-x-4 overflow-x-auto pb-2">
                             {displayImages.map((img: any, idx: any) => (
@@ -227,7 +269,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                                         src={cloudinaryUrl(img)} 
                                         alt={`${PRODUCT.name} view ${idx + 1}`} 
                                         fill 
-                                        loading="lazy" // Lazy load thumbnails
+                                        loading="lazy" 
                                         unoptimized={!isCloudinaryUrl(img)} 
                                         className="object-cover" 
                                     />
@@ -241,7 +283,17 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                 <div className="space-y-8">
                     <div>
                         <h1 className="text-3xl lg:text-4xl font-outfit text-charcoal mb-2">{PRODUCT.name}</h1>
-                        <p className="text-xl font-outfit font-bold text-gold">₹{Number(PRODUCT.price).toFixed(2)}</p>
+                        <div className="flex items-center gap-3">
+                            {PRODUCT.originalPrice && PRODUCT.originalPrice > PRODUCT.price && (
+                                <p className="text-xl font-outfit font-medium text-gray-400 line-through">₹{Number(PRODUCT.originalPrice).toFixed(2)}</p>
+                            )}
+                            <p className="text-xl font-outfit font-bold text-charcoal">₹{Number(PRODUCT.price).toFixed(2)}</p>
+                            {PRODUCT.originalPrice && PRODUCT.originalPrice > PRODUCT.price && (
+                                <span className="ml-2 text-green-600 text-sm font-bold uppercase tracking-widest">
+                                    SAVE {Math.round(((PRODUCT.originalPrice - PRODUCT.price) / PRODUCT.originalPrice) * 100)}%
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className="prose text-charcoal/80 font-outfit">
@@ -341,56 +393,12 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                             className="flex overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory gap-4 md:gap-6 pb-4"
                         >
                             {similarProducts.map((p: any) => (
-                                <Link
+                                <div 
                                     key={p.id}
-                                    href={`/product/${p.id}`}
-                                    className="group relative w-[calc(50%-8px)] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] flex-shrink-0 snap-start bg-white border border-gray-50 rounded-[10px] p-3 flex flex-col transition-all duration-300 hover:shadow-md"
+                                    className="w-[calc(50%-8px)] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] flex-shrink-0 snap-start"
                                 >
-                                    {/* Product Image Container */}
-                                    <div className="relative aspect-square w-full mb-4 overflow-hidden rounded-md bg-stone-50/50 flex items-center justify-center">
-                                        {p.image ? (
-                                            <Image
-                                                src={cloudinaryUrl(p.image)}
-                                                alt={p.name}
-                                                fill
-                                                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                                                unoptimized={!isCloudinaryUrl(p.image)}
-                                            />
-                                        ) : (
-                                            <span className="text-xs text-charcoal/40">NO IMAGE</span>
-                                        )}
-
-                                        {/* Wishlist Button on Top-Right */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                toggleWishlistForProduct(p);
-                                            }}
-                                            className="absolute top-2.5 right-2.5 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm text-charcoal hover:text-gold transition-colors z-10"
-                                            aria-label="Add to Wishlist"
-                                        >
-                                            <Heart
-                                                className="w-3.5 h-3.5"
-                                                fill={isInWishlist(p.id) ? 'currentColor' : 'none'}
-                                            />
-                                        </button>
-                                    </div>
-
-                                    {/* Product Meta */}
-                                    <div className="flex flex-col flex-1">
-                                        <span className="text-[10px] text-charcoal/50 uppercase tracking-widest mb-1 font-semibold font-outfit">
-                                            {p.category}
-                                        </span>
-                                        <h3 className="text-sm font-outfit font-medium text-charcoal group-hover:text-gold transition-colors truncate mb-1">
-                                            {p.name}
-                                        </h3>
-                                        <span className="text-sm font-outfit font-bold text-charcoal mt-auto">
-                                            ₹{Number(p.price).toFixed(2)}
-                                        </span>
-
-                                    </div>
-                                </Link>
+                                    <ProductCard product={p} />
+                                </div>
                             ))}
                         </div>
                     </div>

@@ -15,6 +15,7 @@ const formatProduct = (product) => {
         ...product,
         id: product.id ? product.id.toString() : undefined,
         price: Number(product.price),
+        originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
         image: defaultImage,
         category: product.category ? product.category.name : 'Uncategorized',
         collection: product.collection ? product.collection.name : null,
@@ -45,6 +46,7 @@ const getProducts = async (req, res) => {
                 id: true,
                 name: true,
                 price: true,
+                originalPrice: true,
                 images: true,
                 stock: true,
                 categoryId: true,
@@ -55,8 +57,6 @@ const getProducts = async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        // Add Cache-Control header for better performance (1 minute)
-        res.set('Cache-Control', 'public, max-age=60');
         res.json(products.map(formatProduct));
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -89,9 +89,6 @@ const getProductById = async (req, res) => {
         });
 
         if (product) {
-            // Add Cache-Control header for product details (1 minute)
-            // This makes the Product Detail Page feel nearly instant on returning visits
-            res.set('Cache-Control', 'public, max-age=60');
             res.json(formatProduct(product));
         } else {
             res.status(404).json({ message: 'Product not found' });
@@ -105,7 +102,7 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
-    const { name, price, description, categoryId, collectionId, stock, images } = req.body;
+    const { name, price, originalPrice, description, categoryId, collectionId, stock, images } = req.body;
     // req.files would handle create with images, simplified here
 
     try {
@@ -113,6 +110,7 @@ const createProduct = async (req, res) => {
             data: {
                 name,
                 price: Number(price),
+                originalPrice: originalPrice ? Number(originalPrice) : null,
                 description,
                 categoryId: Number(categoryId), // assuming ID passed
                 collectionId: collectionId ? Number(collectionId) : null,
@@ -130,12 +128,13 @@ const createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = async (req, res) => {
-    const { name, price, description, categoryId, collectionId, stock, images } = req.body;
+    const { name, price, originalPrice, description, categoryId, collectionId, stock, images } = req.body;
 
     try {
         const updateData = {
             name,
             price: Number(price),
+            originalPrice: originalPrice ? Number(originalPrice) : null,
             description,
             categoryId: Number(categoryId),
             collectionId: collectionId ? Number(collectionId) : null,

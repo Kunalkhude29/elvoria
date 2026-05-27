@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import ProductCard from './ProductCard';
+import Link from 'next/link';
 import clsx from 'clsx';
 
 const FILTERS = ['Trending', 'Rings', 'Necklaces', 'Bangles', 'Earrings', 'Mangalsutras'];
@@ -13,7 +14,6 @@ export default function TrendingSection() {
     const [activeFilter, setActiveFilter] = useState('Trending');
     const [products, setProducts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [visibleCount, setVisibleCount] = useState(8);
     const isMounted = useRef(true);
 
     // Fetch ALL products once, cache in memory, filter client-side
@@ -46,7 +46,6 @@ export default function TrendingSection() {
                           );
 
                 setProducts(filtered);
-                setVisibleCount(8); // Reset visible count on filter change
             } catch (err) {
                 console.warn('Failed to fetch trending products', err);
             } finally {
@@ -103,7 +102,7 @@ export default function TrendingSection() {
                         </div>
                     ) : products.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 animate-in fade-in zoom-in duration-500">
-                            {products.slice(0, visibleCount).map(product => (
+                            {products.slice(0, 8).map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
@@ -113,14 +112,14 @@ export default function TrendingSection() {
                         </div>
                     )}
 
-                    {products.length > visibleCount && (
+                    {products.length > 8 && (
                         <div className="mt-16 flex justify-center">
-                            <button 
-                                onClick={() => setVisibleCount(prev => prev + 8)}
-                                className="px-10 py-3 rounded-full border border-charcoal/20 hover:border-charcoal transition-colors uppercase text-xs tracking-widest font-bold text-charcoal"
+                            <Link 
+                                href={activeFilter === 'Trending' ? '/shop' : `/${activeFilter.toLowerCase()}`}
+                                className="px-10 py-3 rounded-none border border-charcoal/20 hover:border-charcoal transition-colors uppercase text-xs tracking-widest font-bold text-charcoal inline-block"
                             >
-                                Load More
-                            </button>
+                                View All
+                            </Link>
                         </div>
                     )}
                 </div>

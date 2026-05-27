@@ -74,9 +74,9 @@ export default function AdminOrdersPage() {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <h1 className="text-3xl font-outfit font-bold text-charcoal">Order Management</h1>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input 

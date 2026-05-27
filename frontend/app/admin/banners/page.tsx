@@ -51,11 +51,11 @@ export default function AdminCollectionsPage() {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <h1 className="text-3xl font-outfit font-bold text-charcoal">Banners</h1>
                 <Link 
                     href="/admin/banners/new" 
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-primary flex items-center justify-center gap-2"
                 >
                     <Plus className="w-5 h-5" />
                     Add Banner Group

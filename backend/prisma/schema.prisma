@@ -81,6 +81,7 @@ model Product {
   name         String
   description  String
   price        Decimal
+  originalPrice Decimal?
   stock        Int         @default(0)
   images       Json        // Array of image URLs
   categoryId   Int?
@@ -162,6 +163,13 @@ model CollectionBanner {
   isActive     Boolean    @default(true)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+}
+
+model HomepageImage {
+  key       String   @id  // e.g., "wedding", "daily-wear", "gifting"
+  image     String
+  updatedAt DateTime @updatedAt
+  @@map("homepage_images")
 }
 
 model PincodeMaster {

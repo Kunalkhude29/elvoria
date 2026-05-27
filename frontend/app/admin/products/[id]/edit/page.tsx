@@ -11,6 +11,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
+    const [originalPrice, setOriginalPrice] = useState('');
     const [stock, setStock] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [categoryId, setCategoryId] = useState('');
@@ -27,16 +28,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             try {
                 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
                 const [prodRes, catRes, colRes] = await Promise.all([
-                    fetch(`${apiBase}/api/products/${resolvedParams.id}`),
+                    fetch(`${apiBase}/api/products/${resolvedParams.id}?t=${Date.now()}`),
                     fetch(`${apiBase}/api/products/categories`),
                     fetch(`${apiBase}/api/collections`)
                 ]);
 
                 if (prodRes.ok) {
                     const data = await prodRes.json();
+                    console.log('Fetched product data:', data);
                     setName(data.name || '');
                     setDescription(data.description || '');
                     setPrice(data.price?.toString() || '');
+                    setOriginalPrice(data.originalPrice?.toString() || '');
                     setStock(data.stock?.toString() || '');
                     setImages(Array.isArray(data.images) ? data.images : []);
                     setCategoryId(data.categoryId?.toString() || '');
@@ -100,6 +103,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 name, 
                 description, 
                 price: parseFloat(price), 
+                originalPrice: originalPrice ? parseFloat(originalPrice) : null,
                 stock: parseInt(stock), 
                 images, 
                 categoryId: categoryId ? parseInt(categoryId) : null,
@@ -159,15 +163,25 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="group">
-                                    <label className="block text-[10px] font-outfit font-semibold uppercase tracking-widest text-gray-400 mb-2 font-bold group-focus-within:text-gold transition-colors">Price (₹)</label>
+                                    <label className="block text-[10px] font-outfit font-semibold uppercase tracking-widest text-gray-400 mb-2 font-bold group-focus-within:text-gold transition-colors">Selling Price (₹)</label>
                                     <input 
                                         type="number" 
                                         required 
                                         value={price} 
                                         onChange={e => setPrice(e.target.value)} 
                                         className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-gold bg-transparent font-outfit font-semibold text-charcoal" 
+                                    />
+                                </div>
+                                <div className="group">
+                                    <label className="block text-[10px] font-outfit font-semibold uppercase tracking-widest text-gray-400 mb-2 font-bold group-focus-within:text-gold transition-colors">Original Price (₹) - Optional</label>
+                                    <input 
+                                        type="number" 
+                                        value={originalPrice} 
+                                        onChange={e => setOriginalPrice(e.target.value)} 
+                                        className="w-full border-b border-gray-200 py-2 focus:outline-none focus:border-gold bg-transparent font-outfit font-semibold text-charcoal placeholder:text-gray-200" 
+                                        placeholder="e.g. 1500"
                                     />
                                 </div>
                                 <div className="group">
