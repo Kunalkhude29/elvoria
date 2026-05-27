@@ -119,13 +119,13 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             </div>
 
             {/* Product Info */}
-            <Link href={`/product/${product.id}`} className="block text-center mt-3">
-                <h3 className="text-base md:text-lg font-outfit font-medium text-charcoal hover:text-gold transition-colors truncate">{product.name}</h3>
-                <div className="flex items-center justify-center gap-2 mt-1">
+            <Link href={`/product/${product.id}`} className="block text-left mt-3">
+                <h3 className="text-sm md:text-base font-outfit font-medium text-charcoal/90 hover:text-gold transition-colors truncate">{product.name}</h3>
+                <div className="flex items-center justify-start gap-2 mt-1">
+                    <p className="text-sm md:text-base font-outfit font-semibold text-charcoal">₹{Number(product.price).toFixed(2)}</p>
                     {product.originalPrice && product.originalPrice > product.price && (
-                        <p className="text-sm md:text-base font-outfit font-medium text-gray-400 line-through">₹{Number(product.originalPrice).toFixed(2)}</p>
+                        <p className="text-xs md:text-sm font-outfit font-normal text-charcoal/40 line-through">₹{Number(product.originalPrice).toFixed(2)}</p>
                     )}
-                    <p className="text-sm md:text-base font-outfit font-bold text-charcoal">₹{Number(product.price).toFixed(2)}</p>
                 </div>
             </Link>
         </div>

@@ -55,7 +55,7 @@ export default function Hero({ initialBanner }: { initialBanner?: any }) {
         return () => { isMounted = false; };
     }, [banner, loading]);
 
-    if (!banner && loading) return <div className="h-[85vh] w-full bg-gray-50 animate-pulse" />;
+    if (!banner && loading) return <div className="h-[70vh] md:h-[85vh] w-full bg-gray-50 animate-pulse" />;
     if (!banner) return null;
 
     const bannerTitle = banner.title || "";
@@ -64,7 +64,7 @@ export default function Hero({ initialBanner }: { initialBanner?: any }) {
     const bannerCta = banner.ctaText || "Shop Now";
 
     return (
-        <section className="relative h-[85vh] w-full overflow-hidden">
+        <section className="relative h-[70vh] md:h-[85vh] w-full overflow-hidden">
             <Image
                 src={cloudinaryUrl(banner.image)}
                 alt={bannerTitle}

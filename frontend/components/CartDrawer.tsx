@@ -177,7 +177,7 @@ export default function CartDrawer() {
                                                         </div>
                                                         <button
                                                             onClick={() => removeFromCart(item.id)}
-                                                            className="text-gray-400 hover:text-red-500 transition-colors p-1 opacity-0 group-hover:opacity-100"
+                                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
