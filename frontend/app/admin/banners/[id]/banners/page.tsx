@@ -13,6 +13,7 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
     const [loading, setLoading] = useState(true);
     
     const [image, setImage] = useState('');
+    const [mobileImage, setMobileImage] = useState('');
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [offerText, setOfferText] = useState('');
@@ -22,6 +23,7 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
     
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [uploadingMobile, setUploadingMobile] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +60,40 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
         }
     };
 
+    const handleMobileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingMobile(true);
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const headers = await getAuthorizedHeaders();
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/upload`, {
+                method: 'POST',
+                headers,
+                body: formData
+            });
+
+            if (res.ok) {
+                const imageUrl = await res.text();
+                const fullUrl = imageUrl.startsWith('/') 
+                    ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}${imageUrl}`
+                    : imageUrl;
+                setMobileImage(fullUrl);
+            } else {
+                alert('Failed to upload mobile image. Please try again.');
+            }
+        } catch (err) {
+            alert('Error uploading mobile image.');
+            console.error(err);
+        } finally {
+            setUploadingMobile(false);
+        }
+    };
+
     const fetchCollection = async () => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/collections/${id}`);
@@ -85,7 +121,7 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
                 'Content-Type': 'application/json'
             });
             
-            const payload = { image, title, subtitle, offerText, ctaText, displayOrder: Number(displayOrder), isActive };
+            const payload = { image, mobileImage, title, subtitle, offerText, ctaText, displayOrder: Number(displayOrder), isActive };
             
             let res;
             if (editingId) {
@@ -136,6 +172,7 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
     const handleEdit = (banner: any) => {
         setEditingId(banner.id);
         setImage(banner.image);
+        setMobileImage(banner.mobileImage || '');
         setTitle(banner.title || '');
         setSubtitle(banner.subtitle || '');
         setOfferText(banner.offerText || '');
@@ -147,6 +184,7 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
     const resetForm = () => {
         setEditingId(null);
         setImage('');
+        setMobileImage('');
         setTitle('');
         setSubtitle('');
         setOfferText('');
@@ -180,34 +218,66 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
                             {editingId ? 'Edit Banner' : 'Add New Banner'}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-outfit font-semibold uppercase tracking-widest text-gray-500 mb-1">Banner Image *</label>
-                                <div className="space-y-4">
-                                    {image && (
-                                        <div className="relative w-full h-32 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 group">
-                                            <img src={image} className="w-full h-full object-cover" alt="Preview" />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <label className="cursor-pointer bg-white text-charcoal px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">
-                                                    Change
-                                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                                                </label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-outfit font-semibold uppercase tracking-widest text-gray-500 mb-1">Desktop Banner *</label>
+                                    <div className="space-y-4">
+                                        {image && (
+                                            <div className="relative w-full h-32 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 group">
+                                                <img src={image} className="w-full h-full object-cover" alt="Preview" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <label className="cursor-pointer bg-white text-charcoal px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">
+                                                        Change
+                                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                    
-                                    {!image && (
-                                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-lg hover:border-gold hover:bg-gray-50 transition-all cursor-pointer group">
-                                            {uploading ? (
-                                                <Loader2 className="w-6 h-6 animate-spin text-gold" />
-                                            ) : (
-                                                <>
-                                                    <Upload className="w-6 h-6 text-gray-300 group-hover:text-gold mb-2" />
-                                                    <p className="text-[10px] text-gray-500 font-outfit font-semibold uppercase tracking-widest">Upload Banner</p>
-                                                </>
-                                            )}
-                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-                                        </label>
-                                    )}
+                                        )}
+                                        
+                                        {!image && (
+                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-lg hover:border-gold hover:bg-gray-50 transition-all cursor-pointer group">
+                                                {uploading ? (
+                                                    <Loader2 className="w-6 h-6 animate-spin text-gold" />
+                                                ) : (
+                                                    <>
+                                                        <Upload className="w-6 h-6 text-gray-300 group-hover:text-gold mb-2" />
+                                                        <p className="text-[10px] text-gray-500 font-outfit font-semibold uppercase tracking-widest text-center">Upload Desktop</p>
+                                                    </>
+                                                )}
+                                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-outfit font-semibold uppercase tracking-widest text-gray-500 mb-1">Mobile Banner (Optional)</label>
+                                    <div className="space-y-4">
+                                        {mobileImage && (
+                                            <div className="relative w-full h-32 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 group">
+                                                <img src={mobileImage} className="w-full h-full object-cover" alt="Preview" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <label className="cursor-pointer bg-white text-charcoal px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-colors">
+                                                        Change
+                                                        <input type="file" className="hidden" accept="image/*" onChange={handleMobileImageUpload} />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {!mobileImage && (
+                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-lg hover:border-gold hover:bg-gray-50 transition-all cursor-pointer group">
+                                                {uploadingMobile ? (
+                                                    <Loader2 className="w-6 h-6 animate-spin text-gold" />
+                                                ) : (
+                                                    <>
+                                                        <Upload className="w-6 h-6 text-gray-300 group-hover:text-gold mb-2" />
+                                                        <p className="text-[10px] text-gray-500 font-outfit font-semibold uppercase tracking-widest text-center">Upload Mobile<br/>(Portrait)</p>
+                                                    </>
+                                                )}
+                                                <input type="file" className="hidden" accept="image/*" onChange={handleMobileImageUpload} disabled={uploadingMobile} />
+                                            </label>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -311,14 +381,28 @@ export default function CollectionBannersPage({ params }: { params: Promise<{ id
                         {collection.banners && collection.banners.length > 0 ? (
                             collection.banners.map((banner: any) => (
                                 <div key={banner.id} className={`bg-white p-4 rounded-xl shadow-sm border ${editingId === banner.id ? 'border-gold' : 'border-gray-100'} flex gap-6 overflow-hidden transition-all`}>
-                                    <div className="w-48 h-32 shrink-0 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative">
-                                        {banner.image && <img src={banner.image} alt="Banner" className="w-full h-full object-cover" />}
-                                        {!banner.image && <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">No Image</div>}
-                                        {!banner.isActive && (
-                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                                <span className="bg-red-500 text-white text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded">Inactive</span>
-                                            </div>
-                                        )}
+                                    <div className="w-48 shrink-0 flex flex-col gap-2">
+                                        <div className="w-full h-24 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative">
+                                            {banner.image ? (
+                                                <img src={banner.image} alt="Desktop Banner" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-[10px] uppercase font-bold tracking-widest">No Desktop Image</div>
+                                            )}
+                                            {!banner.isActive && (
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                                    <span className="bg-red-500 text-white text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded">Inactive</span>
+                                                </div>
+                                            )}
+                                            <div className="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded font-bold">Desktop</div>
+                                        </div>
+                                        <div className="w-full h-24 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative">
+                                            {banner.mobileImage ? (
+                                                <img src={banner.mobileImage} alt="Mobile Banner" className="w-full h-full object-cover object-top" />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-[10px] uppercase font-bold tracking-widest text-center leading-tight">No Mobile<br/>Image</div>
+                                            )}
+                                            <div className="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded font-bold">Mobile</div>
+                                        </div>
                                     </div>
                                     <div className="flex-1 flex flex-col justify-center">
                                         {banner.offerText && <span className="text-gold text-xs font-bold uppercase tracking-widest mb-1">{banner.offerText}</span>}

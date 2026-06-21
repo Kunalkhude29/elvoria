@@ -6,7 +6,7 @@ export default function Footer() {
                 <div className="space-y-4">
                     <h3 className="text-2xl font-outfit font-bold text-charcoal">SHWETA</h3>
                     <p className="text-sm font-outfit text-charcoal/60 leading-relaxed">
-                        Modern gold and silver jewellery for everyday elegance. Designed for the modern muse.
+                        Modern gold plated and forming jewellery for everyday elegance. Designed for the modern muse.
                     </p>
                 </div>
 
@@ -15,9 +15,6 @@ export default function Footer() {
                     <h4 className="font-outfit font-bold mb-4 text-charcoal">About SHWETA</h4>
                     <ul className="space-y-2 text-sm font-outfit text-charcoal/70">
                         <li><a href="#" className="hover:text-gold transition-colors">Our Story</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">Careers</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">Sustainability</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">Press</a></li>
                     </ul>
                 </div>
 
@@ -25,10 +22,8 @@ export default function Footer() {
                 <div>
                     <h4 className="font-outfit font-bold mb-4 text-charcoal">Customer Care</h4>
                     <ul className="space-y-2 text-sm font-outfit text-charcoal/70">
-                        <li><a href="#" className="hover:text-gold transition-colors">Contact Us</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">Shipping & Returns</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">Warranty</a></li>
-                        <li><a href="#" className="hover:text-gold transition-colors">FAQ</a></li>
+                        <li><a href="/customer-care" className="hover:text-gold transition-colors">Contact Us</a></li>
+                        <li><a href="/customer-care" className="hover:text-gold transition-colors">Shipping & Returns</a></li>
                     </ul>
                 </div>
 

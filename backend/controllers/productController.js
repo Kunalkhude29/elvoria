@@ -27,7 +27,7 @@ const formatProduct = (product) => {
 // @access  Public
 const getProducts = async (req, res) => {
     const { category, collection, featured, limit, page } = req.query;
-    const where = {};
+    const where = { isDeleted: false };
 
     if (category) where.category = { name: category };
     if (collection) where.collection = { name: collection };
@@ -166,7 +166,11 @@ const deleteProduct = async (req, res) => {
         res.json({ message: 'Product removed' });
     } catch (error) {
         if (error.code === 'P2003') {
-            return res.status(400).json({ message: 'Cannot delete product: It is associated with existing orders. You may update its stock to 0 instead.' });
+            await prisma.product.update({
+                where: { id: Number(req.params.id) },
+                data: { isDeleted: true }
+            });
+            return res.json({ message: 'Product hidden from store since it has existing orders.' });
         }
         res.status(404).json({ message: 'Product not found or could not be deleted.' });
     }

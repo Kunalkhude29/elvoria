@@ -86,6 +86,7 @@ model Product {
   images       Json        // Array of image URLs
   categoryId   Int?
   collectionId Int?
+  isDeleted    Boolean     @default(false)
   category     Category?   @relation(fields: [categoryId], references: [id])
   collection   Collection? @relation(fields: [collectionId], references: [id])
   orderItems   OrderItem[]
@@ -111,6 +112,16 @@ model Order {
   paymentMethod       String?     // "UPI" | "COD"
   paymentStatus       String?     // "Paid" | "Pending" | "Failed"
   razorpayPaymentId   String?
+  
+  // Shiprocket Tracking Fields
+  shiprocketOrderId    Int?
+  shiprocketShipmentId Int?
+  awbCode              String?
+  courierName          String?
+  trackingUrl          String?
+  shipmentStatus       String?
+  shipmentCreatedAt    DateTime?
+
   items               OrderItem[]
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
@@ -155,6 +166,7 @@ model CollectionBanner {
   collectionId Int
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   image        String
+  mobileImage  String?
   title        String?
   subtitle     String?
   offerText    String?

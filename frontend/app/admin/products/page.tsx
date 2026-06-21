@@ -30,9 +30,15 @@ export default function ProductsPage() {
                 method: 'DELETE',
                 headers
             });
-            if (res.ok) setProducts(prev => prev.filter((p: any) => p.id !== id));
+            if (res.ok) {
+                setProducts(prev => prev.filter((p: any) => p.id !== id));
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert(errorData.message || 'Failed to delete product. It might be associated with existing orders.');
+            }
         } catch (error) {
             console.error('Delete failed', error);
+            alert('An error occurred while deleting the product.');
         }
     };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Package, ShoppingCart, TrendingUp } from 'lucide-react';
+import { Package, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 import { getAuthorizedHeaders } from '@/lib/auth';
 
@@ -42,7 +42,8 @@ export default function AdminDashboard() {
     const statCards = [
         { title: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString()}`, icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
         { title: 'Total Orders', value: stats.totalOrders, icon: ShoppingCart, color: 'text-blue-600', bg: 'bg-blue-50' },
-        { title: 'Total Products', value: stats.totalProducts, icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' }
+        { title: 'Total Products', value: stats.totalProducts, icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' },
+        { title: 'Total Customers', value: stats.totalCustomers, icon: Users, color: 'text-orange-600', bg: 'bg-orange-50' }
     ];
 
     return (

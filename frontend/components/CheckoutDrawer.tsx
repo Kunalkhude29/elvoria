@@ -602,9 +602,6 @@ export default function CheckoutDrawer() {
                                                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${paymentMethod === 'UPI' ? 'border-charcoal' : 'border-gray-300'}`}>
                                                         {paymentMethod === 'UPI' && <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />}
                                                     </div>
-                                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-sm">
-                                                        <QrCode className="w-6 h-6 text-charcoal" />
-                                                    </div>
                                                     <span className="font-bold text-charcoal font-outfit font-semibold">UPI</span>
                                                 </div>
                                                 <div className="text-right">
@@ -622,13 +619,7 @@ export default function CheckoutDrawer() {
                                                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${paymentMethod === 'COD' ? 'border-amber-600' : 'border-gray-300'}`}>
                                                     {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 bg-amber-600 rounded-full" />}
                                                 </div>
-                                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-sm">
-                                                    <Truck className={`w-6 h-6 ${paymentMethod === 'COD' ? 'text-amber-600' : 'text-gray-400'}`} />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-charcoal font-outfit font-semibold">Cash on Delivery</span>
-                                                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full inline-block mt-0.5 w-max">Easy partial COD available</span>
-                                                </div>
+                                                <span className="font-bold text-charcoal font-outfit font-semibold">Cash on Delivery</span>
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <div className="text-sm font-bold text-charcoal font-outfit font-semibold">₹{cartTotal.toFixed(2)}</div>

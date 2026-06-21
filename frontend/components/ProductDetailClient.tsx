@@ -11,6 +11,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { cloudinaryUrl, isCloudinaryUrl } from '@/lib/cloudinary';
 import ProductCard from './ProductCard';
+import CustomerReviews from './CustomerReviews';
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
     const [PRODUCT, setProduct] = useState<any>(initialProduct);
@@ -24,6 +25,30 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
     const [similarProducts, setSimilarProducts] = useState<any[]>([]);
     const carouselRef = useRef<HTMLDivElement>(null);
+
+    // EDD States
+    const [deliveryPincode, setDeliveryPincode] = useState('');
+    const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+    const [deliveryEstimate, setDeliveryEstimate] = useState<any>(null);
+
+    const handleCheckPincode = async () => {
+        if (!deliveryPincode || deliveryPincode.length !== 6) return;
+        setIsCheckingPincode(true);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shiprocket/serviceability?pincode=${deliveryPincode}`);
+            if (res.ok) {
+                const data = await res.json();
+                setDeliveryEstimate(data);
+            } else {
+                setDeliveryEstimate({ serviceable: false });
+            }
+        } catch (error) {
+            console.error('Pincode check error:', error);
+            setDeliveryEstimate({ serviceable: false });
+        } finally {
+            setIsCheckingPincode(false);
+        }
+    };
 
     const scroll = (direction: 'left' | 'right') => {
         if (carouselRef.current) {
@@ -356,6 +381,76 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                         </div>
                         <p>Free shipping on orders over ₹150.</p>
                     </div>
+
+                    {/* Delivery & Services */}
+                    <div className="pt-8 border-t border-gray-200 mt-8 space-y-4">
+                        <h3 className="text-sm font-outfit font-bold uppercase tracking-widest text-charcoal">Delivery & Services</h3>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Enter Pincode"
+                                maxLength={6}
+                                value={deliveryPincode}
+                                onChange={(e) => setDeliveryPincode(e.target.value.replace(/\D/g, ''))}
+                                className="flex-1 px-4 py-3 border border-gray-300 font-outfit text-sm focus:outline-none focus:border-charcoal transition-colors bg-white text-black"
+                            />
+                            <button
+                                onClick={handleCheckPincode}
+                                disabled={isCheckingPincode || deliveryPincode.length !== 6}
+                                className="px-6 py-3 bg-charcoal text-white font-outfit text-sm font-bold tracking-wider hover:bg-black transition-colors disabled:opacity-50"
+                            >
+                                {isCheckingPincode ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Check'}
+                            </button>
+                        </div>
+                        {deliveryEstimate && (
+                            <div className="text-sm font-outfit mt-3">
+                                {deliveryEstimate.serviceable ? (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center text-green-600 gap-1.5 font-medium">
+                                            <span>✓ Delivery Available</span>
+                                        </div>
+                                        {deliveryEstimate.estimatedDeliveryDate && (
+                                            <p className="text-charcoal/80">
+                                                Estimated Delivery:<br/>
+                                                <span className="font-semibold text-charcoal">
+                                                    {(() => {
+                                                        const end = new Date(deliveryEstimate.estimatedDeliveryDate);
+                                                        let start = new Date(end);
+                                                        start.setDate(start.getDate() - 2);
+                                                        
+                                                        // Ensure start date is never in the past (at least tomorrow)
+                                                        const tomorrow = new Date();
+                                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                                        tomorrow.setHours(0, 0, 0, 0);
+                                                        
+                                                        if (start < tomorrow) {
+                                                            start = tomorrow;
+                                                        }
+                                                        
+                                                        // If the ETD is literally today or tomorrow, ensure start doesn't exceed end
+                                                        if (start > end) {
+                                                            start = new Date(end);
+                                                        }
+                                                        
+                                                        const formatOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long' };
+                                                        
+                                                        // If start and end are the same day, just show one date
+                                                        if (start.toDateString() === end.toDateString()) {
+                                                            return `${end.toLocaleDateString('en-IN', formatOpts)}`;
+                                                        }
+                                                        
+                                                        return `${start.toLocaleDateString('en-IN', formatOpts)} - ${end.toLocaleDateString('en-IN', formatOpts)}`;
+                                                    })()}
+                                                </span>
+                                            </p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <p className="text-red-500 font-medium">Delivery is currently unavailable for this pincode.</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
                 </div>
             </div>
@@ -404,6 +499,9 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                     </div>
                 </section>
             )}
+
+            {/* Customer Reviews Section */}
+            <CustomerReviews />
 
             {/* Toast Notification */}
             <AnimatePresence>

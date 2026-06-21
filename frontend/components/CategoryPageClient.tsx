@@ -107,6 +107,7 @@ export default function CategoryPageClient({
                     title={banner.title || ''} 
                     subtitle={banner.subtitle}
                     backgroundImage={banner.image || banner.heroImage}
+                    mobileImage={banner.mobileImage}
                     offerText={banner.offerText}
                     ctaText={banner.ctaText}
                     priority={true} // Priority loading for the top banner

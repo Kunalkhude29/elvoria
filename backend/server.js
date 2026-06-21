@@ -51,6 +51,7 @@ const userRoutes = require('./routes/userRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const pincodeRoutes = require('./routes/pincodeRoutes');
 const homepageImageRoutes = require('./routes/homepageImageRoutes');
+const shiprocketRoutes = require('./routes/shiprocketRoutes');
 const path = require('path');
 
 app.use('/api/auth', authRoutes);
@@ -64,6 +65,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/pincode', pincodeRoutes);
 app.use('/api/homepage-images', homepageImageRoutes);
+app.use('/api/shiprocket', shiprocketRoutes);
 
 // Make uploads folder manually accessible statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

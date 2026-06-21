@@ -109,12 +109,13 @@ const deleteCollection = async (req, res) => {
 // @route   POST /api/collections/:id/banners
 // @access  Private/Admin
 const addBanner = async (req, res) => {
-    const { image, title, subtitle, offerText, ctaText, displayOrder, isActive } = req.body;
+    const { image, mobileImage, title, subtitle, offerText, ctaText, displayOrder, isActive } = req.body;
     try {
         const banner = await prisma.collectionBanner.create({
             data: {
                 collectionId: Number(req.params.id),
                 image,
+                mobileImage,
                 title,
                 subtitle,
                 offerText,
@@ -133,12 +134,13 @@ const addBanner = async (req, res) => {
 // @route   PUT /api/collections/banners/:bannerId
 // @access  Private/Admin
 const updateBanner = async (req, res) => {
-    const { image, title, subtitle, offerText, ctaText, displayOrder, isActive } = req.body;
+    const { image, mobileImage, title, subtitle, offerText, ctaText, displayOrder, isActive } = req.body;
     try {
         const banner = await prisma.collectionBanner.update({
             where: { id: Number(req.params.bannerId) },
             data: {
                 image,
+                mobileImage,
                 title,
                 subtitle,
                 offerText,
@@ -177,3 +179,4 @@ module.exports = {
     updateBanner,
     deleteBanner
 };
+

@@ -64,41 +64,45 @@ export default function Hero({ initialBanner }: { initialBanner?: any }) {
     const bannerCta = banner.ctaText || "Shop Now";
 
     return (
-        <section className="relative h-[70vh] md:h-[85vh] w-full overflow-hidden">
-            <Image
-                src={cloudinaryUrl(banner.image)}
-                alt={bannerTitle}
-                fill
-                priority
-                unoptimized={!isCloudinaryUrl(banner.image)}
-                className="object-cover"
-            />
-            <div className="absolute inset-0 bg-transparent flex flex-col items-center justify-center text-center px-4">
-                <div className="max-w-3xl">
-                    {bannerOffer && (
-                        <span className="text-white font-outfit uppercase tracking-[0.3em] text-sm mb-4 block drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-normal">
-                            {bannerOffer}
-                        </span>
-                    )}
-                    
-                    {bannerTitle && (
-                        <h1 className="text-5xl md:text-7xl text-white font-outfit font-normal mb-8 tracking-tight leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] uppercase">
-                            {bannerTitle.includes(' ') ? (
-                                <>
-                                    {bannerTitle.substring(0, bannerTitle.lastIndexOf(' '))} <br />
-                                    {bannerTitle.substring(bannerTitle.lastIndexOf(' ') + 1)}
-                                </>
-                            ) : bannerTitle}
-                        </h1>
-                    )}
-                    {bannerSubtitle && (
-                        <p className="text-lg md:text-xl text-white font-outfit max-w-xl mx-auto mb-10 leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-medium">
-                            {bannerSubtitle}
-                        </p>
-                    )}
-
-                </div>
+        <section className="w-full">
+            {/* ── DESKTOP: Natural aspect ratio — zero cropping, full image visible ── */}
+            <div className="relative hidden md:block w-full">
+                <Image
+                    src={cloudinaryUrl(banner.image)}
+                    alt={bannerTitle}
+                    width={1920}
+                    height={1080}
+                    priority
+                    unoptimized={!isCloudinaryUrl(banner.image)}
+                    className="w-full h-auto block"
+                />
             </div>
+
+            {/* ── MOBILE ── */}
+            {banner.mobileImage ? (
+                <div className="relative block md:hidden w-full">
+                    <Image
+                        src={cloudinaryUrl(banner.mobileImage)}
+                        alt={bannerTitle}
+                        width={1080}
+                        height={1920}
+                        priority
+                        unoptimized={!isCloudinaryUrl(banner.mobileImage)}
+                        className="w-full h-auto block"
+                    />
+                </div>
+            ) : (
+                <div className="relative block md:hidden h-[70vh] w-full overflow-hidden">
+                    <Image
+                        src={cloudinaryUrl(banner.image)}
+                        alt={bannerTitle}
+                        fill
+                        priority
+                        unoptimized={!isCloudinaryUrl(banner.image)}
+                        className="object-cover object-top"
+                    />
+                </div>
+            )}
         </section>
     );
 }

@@ -101,7 +101,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             </Link>
 
             {/* Quick Actions (Hover) */}
-            <div className="absolute bottom-28 md:bottom-32 right-3 md:right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <div className="absolute bottom-28 md:bottom-32 right-3 md:right-4 hidden md:flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                 <button
                     onClick={toggleWishlist}
                     className={`p-2 rounded-full shadow-sm transition-colors ${isWished ? 'bg-gold text-white' : 'bg-white hover:bg-gold hover:text-white'}`}

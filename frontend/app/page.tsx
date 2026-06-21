@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 
 // Lazy load below-the-fold components with NO SSR for maximum initial speed
 const TrendingSection = dynamic(() => import('../components/TrendingSection'));
-const CustomerReviews = dynamic(() => import('../components/CustomerReviews'));
+const VisitOurStores = dynamic(() => import('../components/VisitOurStores'));
 
 async function getHeroBanner() {
   try {
@@ -45,7 +45,7 @@ export default async function Home() {
       {/* Lower sections are lazy-loaded to prioritize the Hero banner above-the-fold */}
       <CuratedSection />
       <TrendingSection />
-      <CustomerReviews />
+      <VisitOurStores />
     </main>
   );
 }

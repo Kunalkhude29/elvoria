@@ -7,25 +7,55 @@ interface PageHeroProps {
     title?: string;
     subtitle?: string;
     backgroundImage?: string;
+    mobileImage?: string;
     offerText?: string;
     ctaText?: string;
     priority?: boolean;
 }
 
-export default function PageHero({ title, subtitle, backgroundImage, offerText, ctaText, priority = true }: PageHeroProps) {
+export default function PageHero({ title, subtitle, backgroundImage, mobileImage, offerText, ctaText, priority = true }: PageHeroProps) {
     if (!backgroundImage) return null;
 
     return (
-        <section className="relative w-full overflow-hidden aspect-[21/9] md:aspect-[2726/1158] bg-gray-50">
-            {/* Optimized Background Image */}
-            <Image
-                src={cloudinaryUrl(backgroundImage)}
-                alt={title || 'Collection Banner'}
-                fill
-                priority={priority}
-                unoptimized={!isCloudinaryUrl(backgroundImage)}
-                className="object-cover"
-            />
+        <section className="relative w-full overflow-hidden bg-gray-50">
+            {/* ── DESKTOP: Natural aspect ratio — zero cropping, full image visible ── */}
+            <div className="relative hidden md:block w-full">
+                <Image
+                    src={cloudinaryUrl(backgroundImage)}
+                    alt={title || 'Collection Banner'}
+                    width={1920}
+                    height={1080}
+                    priority={priority}
+                    unoptimized={!isCloudinaryUrl(backgroundImage)}
+                    className="w-full h-auto block"
+                />
+            </div>
+
+            {/* ── MOBILE ── */}
+            {mobileImage ? (
+                <div className="relative block md:hidden w-full">
+                    <Image
+                        src={cloudinaryUrl(mobileImage)}
+                        alt={title || 'Mobile Banner'}
+                        width={1080}
+                        height={1920}
+                        priority={priority}
+                        unoptimized={!isCloudinaryUrl(mobileImage)}
+                        className="w-full h-auto block"
+                    />
+                </div>
+            ) : (
+                <div className="relative block md:hidden h-[70vh] w-full overflow-hidden">
+                    <Image
+                        src={cloudinaryUrl(backgroundImage)}
+                        alt={title || 'Collection Banner'}
+                        fill
+                        priority={priority}
+                        unoptimized={!isCloudinaryUrl(backgroundImage)}
+                        className="object-cover object-top"
+                    />
+                </div>
+            )}
 
             {/* Content Overlay */}
             <div className="absolute inset-0 flex items-center justify-center text-center p-6 bg-black/20">

@@ -111,6 +111,7 @@ export default function AdminOrdersPage() {
                                 <th className="px-6 py-4">Customer</th>
                                 <th className="px-6 py-4">Date</th>
                                 <th className="px-6 py-4">Total</th>
+                                <th className="px-6 py-4">Payment</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
@@ -118,11 +119,11 @@ export default function AdminOrdersPage() {
                         <tbody className="divide-y divide-gray-100 text-alegreya">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading orders...</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">Loading orders...</td>
                                 </tr>
                             ) : filteredOrders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No orders found.</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">No orders found.</td>
                                 </tr>
                             ) : (
                                     filteredOrders.map((order: any) => (
@@ -143,6 +144,9 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="px-6 py-4 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
                                             <td className="px-6 py-4 font-outfit font-semibold font-bold">₹{order.total}</td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-bold text-charcoal">{order.paymentMethod || 'COD'}</span>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1 rounded-full text-[10px] font-outfit font-semibold font-bold uppercase tracking-wider ${getStatusStyle(order.status)}`}>
                                                     {order.status}

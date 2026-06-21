@@ -394,6 +394,16 @@ export default function ProfilePage() {
                                                 </Link>
                                             ))}
                                         </div>
+
+                                        {order.awbCode && (
+                                            <div className="mt-6 pt-6 border-t border-gray-100">
+                                                <OrderTracking 
+                                                    awbCode={order.awbCode} 
+                                                    courierName={order.courierName} 
+                                                    shipmentStatus={order.shipmentStatus} 
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -664,6 +674,135 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </footer>
+        </div>
+    );
+}
+
+function OrderTracking({ awbCode, courierName, shipmentStatus }: { awbCode: string, courierName?: string, shipmentStatus?: string }) {
+    const [trackingData, setTrackingData] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleTrack = async () => {
+        if (isExpanded) {
+            setIsExpanded(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setIsExpanded(true);
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shiprocket/track/${awbCode}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setTrackingData(data);
+            } else {
+                setError('Failed to fetch live tracking data');
+            }
+        } catch (e) {
+            setError('An error occurred while fetching tracking details.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-1">
+                    <p className="text-[12px] text-gray-500 font-medium uppercase tracking-wider">Shipment Details</p>
+                    <div className="flex items-center gap-3">
+                        <span className="text-[14px] font-semibold text-black">{courierName || 'Shiprocket'}</span>
+                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                        <span className="text-[14px] text-gray-600 font-mono text-sm">{awbCode}</span>
+                    </div>
+                </div>
+                <button 
+                    onClick={handleTrack}
+                    className="px-4 py-2 bg-charcoal text-white text-[13px] font-medium rounded hover:bg-black transition-colors flex items-center gap-2"
+                >
+                    {isLoading ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Loading...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Package className="w-4 h-4" />
+                            <span>{isExpanded ? 'Hide Tracking' : 'Track Shipment'}</span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {isExpanded && (
+                <div className="mt-4 bg-gray-50 rounded-lg p-5 border border-gray-100">
+                    {isLoading ? (
+                        <div className="h-24 flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin" />
+                        </div>
+                    ) : error ? (
+                        <p className="text-red-500 text-sm font-medium">{error}</p>
+                    ) : trackingData && trackingData.tracking_data ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-semibold ${
+                                    trackingData.tracking_data.track_status === 1 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                    {trackingData.tracking_data.track_status === 1 ? 'Delivered' : trackingData.tracking_data.shipment_status || shipmentStatus || 'In Transit'}
+                                </span>
+                                {trackingData.tracking_data.etd && (
+                                    <span className="text-[13px] text-gray-600 font-medium ml-auto">
+                                        Expected: {new Date(trackingData.tracking_data.etd).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </span>
+                                )}
+                            </div>
+                            
+                            {/* Tracking Timeline */}
+                            <div className="relative border-l border-gray-200 ml-3 pl-6 space-y-6">
+                                {(() => {
+                                    const activities = trackingData.tracking_data.shipment_track_activities || trackingData.tracking_data.shipment_track || [];
+                                    if (!activities || activities.length === 0) {
+                                        return <p className="text-[14px] text-gray-500">No tracking history available yet.</p>;
+                                    }
+
+                                    return activities.map((activity: any, idx: number) => {
+                                        const title = activity.activity || activity.current_status || 'Tracking Assigned';
+                                        const dateStr = activity.date || activity.updated_time_stamp;
+                                        const isValidDate = dateStr && new Date(dateStr).getTime() > 0;
+
+                                        return (
+                                            <div key={idx} className="relative">
+                                                <div className="absolute -left-[31px] top-1 w-3 h-3 bg-white border-2 border-charcoal rounded-full" />
+                                                <p className="text-[14px] font-medium text-black">{title}</p>
+                                                {isValidDate ? (
+                                                    <p className="text-[12px] text-gray-500 mt-1">
+                                                        {activity.location && `${activity.location} • `}
+                                                        {new Date(dateStr).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-[12px] text-gray-500 mt-1">
+                                                        Pending courier pickup
+                                                    </p>
+                                                )}
+                                            </div>
+                                        );
+                                    });
+                                })()}
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 text-sm">No tracking data available yet.</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
