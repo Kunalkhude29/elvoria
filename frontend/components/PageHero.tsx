@@ -45,14 +45,15 @@ export default function PageHero({ title, subtitle, backgroundImage, mobileImage
                     />
                 </div>
             ) : (
-                <div className="relative block md:hidden h-[70vh] w-full overflow-hidden">
+                <div className="relative block md:hidden w-full">
                     <Image
                         src={cloudinaryUrl(backgroundImage)}
                         alt={title || 'Collection Banner'}
-                        fill
+                        width={1920}
+                        height={1080}
                         priority={priority}
                         unoptimized={!isCloudinaryUrl(backgroundImage)}
-                        className="object-cover object-top"
+                        className="w-full h-auto block"
                     />
                 </div>
             )}
