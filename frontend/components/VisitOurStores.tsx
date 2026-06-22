@@ -21,7 +21,7 @@ const stores = [
         id: 3,
         title: "Shweta One Gram Gold, Ishwarpur",
         address: "Gandhi Chowk, Opposite to Bombay Tailor,\nIshwarpur, Maharashtra 415409",
-        link: "https://maps.google.com/?q=Shweta+One+Gram+Gold,+Gandhi+Chowk,+Opposite+to+Bombay+Tailor,+Ishwarpur,+Maharashtra+415409",
+        link: "https://www.google.com/maps/dir//SHWETA+ONE+GRAM+GOLD,+27X8%2BR22,+Gandhi+Chowk,+Urun-Ishwarpur,+Maharashtra+415409/@18.5139471,73.806616,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3bc17500494a4fc7:0xd7172961cbc18215!2m2!1d74.2651111!2d17.0494722?hl=en-GB&authuser=0&entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
         image: "/images/store-image-3.jpeg"
     }
 ];
