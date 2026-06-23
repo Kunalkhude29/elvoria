@@ -217,6 +217,58 @@ const verifyRazorpayPayment = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Handle Razorpay payment failure and restore stock
+// @route   POST /api/payments/razorpay/fail
+// @access  Private
+// ─────────────────────────────────────────────────────────────────────────────
+const failRazorpayPayment = async (req, res) => {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+        return res.status(400).json({ message: 'Missing orderId' });
+    }
+
+    try {
+        const order = await prisma.order.findUnique({
+            where: { id: Number(orderId) },
+            include: { items: true }
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (order.status === 'PAYMENT_FAILED' || order.status === 'CANCELLED') {
+            return res.status(200).json({ success: true, message: 'Already marked as failed/cancelled' });
+        }
+
+        await prisma.$transaction(async (tx) => {
+            // Restore stock
+            for (const item of order.items) {
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: { stock: { increment: item.quantity } },
+                });
+            }
+
+            // Update order status
+            await tx.order.update({
+                where: { id: Number(orderId) },
+                data: {
+                    paymentStatus: 'Failed',
+                    status: 'PAYMENT_FAILED'
+                },
+            });
+        });
+
+        return res.status(200).json({ success: true, message: 'Order marked as failed and stock restored.' });
+    } catch (err) {
+        console.error('[PAYMENT] failRazorpayPayment error:', err);
+        return res.status(500).json({ message: 'Failed to process payment failure' });
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Place COD order — skip Razorpay entirely
 // @route   POST /api/payments/cod/create-order
 // @access  Private
@@ -268,4 +320,9 @@ const createCODOrder = async (req, res) => {
     }
 };
 
-module.exports = { createRazorpayOrder, verifyRazorpayPayment, createCODOrder };
+module.exports = {
+    createRazorpayOrder,
+    verifyRazorpayPayment,
+    failRazorpayPayment,
+    createCODOrder,
+};

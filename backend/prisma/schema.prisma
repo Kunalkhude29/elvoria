@@ -18,10 +18,25 @@ enum Role {
 enum OrderStatus {
   PENDING
   SHIPPED
+  OUT_FOR_DELIVERY
   DELIVERED
   CANCELLED
+  RETURN_INITIATED
+  RETURN_COLLECTED
+  REFUND_PROCESSING
+  REFUND_COMPLETED
+  PAYMENT_FAILED
+}
 
+enum RequestType {
+  RETURN
+  CANCEL
+}
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Profile {
@@ -123,10 +138,18 @@ model Order {
   shipmentCreatedAt    DateTime?
 
   items               OrderItem[]
+  requests            OrderRequest[]
+
+  // Cancellation and Refund Tracking
+  cancelledBy         String?     // "CUSTOMER" | "ADMIN"
+  cancellationReason  String?
+  cancelledAt         DateTime?
+  refundStatus        String?     @default("NOT_REQUIRED") // "PENDING" | "COMPLETED" | "NOT_REQUIRED"
+
+  deliveredAt         DateTime?
+
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
-
-
 }
 
 model OrderItem {
@@ -198,4 +221,25 @@ model PincodeMaster {
   @@index([district])
   @@index([state])
   @@map("pincode_master")
+}
+
+model OrderRequest {
+  id        Int           @id @default(autoincrement())
+  orderId   Int
+  order     Order         @relation(fields: [orderId], references: [id])
+  type      RequestType
+  reason    String
+  status    RequestStatus @default(PENDING)
+  
+  // Bank Details for COD returns
+  bankAccountName     String?
+  bankName            String?
+  bankAccountNumber   String?
+  bankIfscCode        String?
+  upiId               String?
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("order_requests")
 }

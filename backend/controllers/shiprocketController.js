@@ -121,8 +121,9 @@ const webhook = async (req, res) => {
             // Map Shiprocket status to app OrderStatus
             // Shiprocket statuses: PICKED UP, IN TRANSIT, OUT FOR DELIVERY, DELIVERED, RTO INITIATED, etc.
             if (current_status === 'DELIVERED') appStatus = 'DELIVERED';
-            else if (['SHIPPED', 'IN TRANSIT', 'PICKED UP', 'OUT FOR DELIVERY'].includes(current_status)) appStatus = 'SHIPPED';
-            else if (current_status === 'CANCELED') appStatus = 'CANCELLED';
+            else if (current_status === 'OUT FOR DELIVERY') appStatus = 'OUT_FOR_DELIVERY';
+            else if (['SHIPPED', 'IN TRANSIT', 'PICKED UP'].includes(current_status)) appStatus = 'SHIPPED';
+            else if (current_status === 'CANCELED' || current_status === 'Pickup Cancelled') appStatus = 'CANCELLED';
 
             await prisma.order.update({
                 where: { id: order.id },

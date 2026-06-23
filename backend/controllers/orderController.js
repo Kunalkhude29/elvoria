@@ -140,7 +140,8 @@ const getOrderById = async (req, res) => {
                     include: {
                         product: { select: { name: true, images: true, id: true, price: true } }
                     }
-                }
+                },
+                requests: true
             }
         });
 
@@ -165,7 +166,7 @@ const updateOrderStatus = async (req, res) => {
     const orderId = Number(req.params.id);
 
     // Validate status
-    const validStatuses = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+    const validStatuses = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_INITIATED', 'RETURN_COLLECTED', 'REFUND_PROCESSING', 'REFUND_COMPLETED'];
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: 'Invalid status' });
     }
@@ -179,6 +180,12 @@ const updateOrderStatus = async (req, res) => {
 
         if (!currentOrder) {
             return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Prepare update data payload
+        const updateData = { status };
+        if (status === 'DELIVERED') {
+            updateData.deliveredAt = new Date();
         }
 
         // Check if the order is moving into a status that requires stock deduction
@@ -197,7 +204,7 @@ const updateOrderStatus = async (req, res) => {
                 // Update Order Status
                 const updatedOrder = await tx.order.update({
                     where: { id: orderId },
-                    data: { status }
+                    data: updateData
                 });
 
                 // Iterate over all purchased items
@@ -220,7 +227,7 @@ const updateOrderStatus = async (req, res) => {
             await prisma.$transaction(async (tx) => {
                 const updatedOrder = await tx.order.update({
                     where: { id: orderId },
-                    data: { status }
+                    data: updateData
                 });
 
                 for (const item of currentOrder.items) {
@@ -240,7 +247,7 @@ const updateOrderStatus = async (req, res) => {
             // Normal update without stock changes
             const order = await prisma.order.update({
                 where: { id: orderId },
-                data: { status }
+                data: updateData
             });
             res.json(order);
         }
@@ -257,13 +264,17 @@ const updateOrderStatus = async (req, res) => {
 const getMyOrders = async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
-            where: { userId: req.user.id },
+            where: { 
+                userId: req.user.id,
+                status: { not: 'PAYMENT_FAILED' }
+            },
             include: {
                 items: {
                     include: {
                         product: { select: { name: true, images: true, id: true } }
                     }
-                }
+                },
+                requests: true
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -273,5 +284,33 @@ const getMyOrders = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, getOrders, getOrderById, updateOrderStatus, getMyOrders };
+// @desc    Get a single logged in user order by ID
+// @route   GET /api/orders/myorders/:id
+// @access  Private
+const getMyOrderById = async (req, res) => {
+    try {
+        const orderId = Number(req.params.id);
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+                items: {
+                    include: {
+                        product: { select: { name: true, images: true, id: true } }
+                    }
+                },
+                requests: true
+            }
+        });
+
+        if (!order || order.userId !== req.user.id) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { createOrder, getOrders, getOrderById, updateOrderStatus, getMyOrders, getMyOrderById };
 

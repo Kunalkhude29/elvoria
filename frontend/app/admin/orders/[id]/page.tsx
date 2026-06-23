@@ -152,6 +152,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                             <option value="PROCESSING">Processing</option>
                             <option value="SHIPPED">Shipped</option>
                             <option value="DELIVERED">Delivered</option>
+                            <option value="RETURN_INITIATED">Return Initiated</option>
+                            <option value="RETURN_COLLECTED">Return Collected</option>
+                            <option value="REFUND_PROCESSING">Refund Processing</option>
+                            <option value="REFUND_COMPLETED">Refund Completed</option>
+                            <option value="PAYMENT_FAILED">Payment Failed</option>
                             <option value="CANCELLED">Cancelled</option>
                         </select>
                     </div>
@@ -211,8 +216,115 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
 
-                {/* Right Column: Customer & Shipping */}
+                {/* Right Column: Customer & Shipping & Cancellation */}
                 <div className="space-y-8">
+                    {/* Refund Alert */}
+                    {(order.refundStatus === 'PENDING' || (order.paymentMethod !== 'COD' && order.status === 'RETURN_COLLECTED')) && (
+                        <div className="bg-red-50 rounded-2xl border border-red-200 shadow-sm p-6 flex flex-col gap-4 animate-pulse">
+                            <div className="flex items-start gap-4">
+                                <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                                <div>
+                                    <h2 className="font-outfit font-bold text-red-700 text-lg">Refund Required</h2>
+                                    <p className="text-red-600 text-sm font-outfit mt-1">
+                                        This order was {order.status === 'RETURN_COLLECTED' ? 'returned' : 'cancelled'} but paid online. A refund needs to be processed via Razorpay.
+                                    </p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => updateStatus('REFUND_COMPLETED')}
+                                className="bg-red-600 hover:bg-red-700 text-white font-outfit font-bold py-2 px-4 rounded-lg self-start transition-colors text-sm"
+                            >
+                                Process Refund
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Bank Details for COD Return */}
+                    {order.paymentMethod === 'COD' && order.requests?.some((req: any) => req.type === 'RETURN') && (
+                        <div className="bg-teal-50 rounded-2xl border border-teal-100 shadow-sm overflow-hidden">
+                            <div className="p-6 border-b border-teal-100 flex items-center gap-3 bg-teal-100/30">
+                                <CreditCard className="w-5 h-5 text-teal-600" />
+                                <h2 className="font-outfit font-bold text-teal-800 uppercase tracking-widest">Customer Bank Details</h2>
+                            </div>
+                            <div className="p-6 space-y-4 font-outfit font-semibold">
+                                {order.requests.filter((req: any) => req.type === 'RETURN').map((req: any) => (
+                                    <div key={req.id} className="space-y-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="p-2 bg-teal-100 rounded-lg text-teal-600"><User className="w-4 h-4" /></div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-widest text-teal-600/70 font-bold mb-1">Account Holder Name</p>
+                                                <p className="text-teal-900 font-bold">{req.bankAccountName || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="p-2 bg-teal-100 rounded-lg text-teal-600"><CreditCard className="w-4 h-4" /></div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-widest text-teal-600/70 font-bold mb-1">Bank Name</p>
+                                                <p className="text-teal-900 font-bold">{req.bankName || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="p-2 bg-teal-100 rounded-lg text-teal-600"><CreditCard className="w-4 h-4" /></div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-widest text-teal-600/70 font-bold mb-1">Account Number</p>
+                                                <p className="text-teal-900 font-bold">{req.bankAccountNumber || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="p-2 bg-teal-100 rounded-lg text-teal-600"><MapPin className="w-4 h-4 opacity-0" /></div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-widest text-teal-600/70 font-bold mb-1">IFSC Code</p>
+                                                <p className="text-teal-900 font-bold">{req.bankIfscCode || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        {req.upiId && (
+                                            <div className="flex items-start gap-4">
+                                                <div className="p-2 bg-teal-100 rounded-lg text-teal-600"><MapPin className="w-4 h-4 opacity-0" /></div>
+                                                <div>
+                                                    <p className="text-[10px] uppercase tracking-widest text-teal-600/70 font-bold mb-1">UPI ID</p>
+                                                    <p className="text-teal-900 font-bold">{req.upiId}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Cancellation Info */}
+                    {order.status === 'CANCELLED' && order.cancellationReason && (
+                        <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+                            <div className="p-6 border-b border-red-50 flex items-center gap-3 bg-red-50/30">
+                                <XCircle className="w-5 h-5 text-red-500" />
+                                <h2 className="font-outfit font-bold text-red-700 uppercase tracking-widest">Cancellation Details</h2>
+                            </div>
+                            <div className="p-6 space-y-4 font-outfit font-semibold">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2 bg-red-50 rounded-lg text-red-500"><User className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Cancelled By</p>
+                                        <p className="text-charcoal font-bold">{order.cancelledBy || 'Unknown'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2 bg-red-50 rounded-lg text-red-500"><Clock className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Cancelled At</p>
+                                        <p className="text-charcoal font-bold">{order.cancelledAt ? new Date(order.cancelledAt).toLocaleString() : 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2 bg-red-50 rounded-lg text-red-500"><MapPin className="w-4 h-4 opacity-0" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Reason</p>
+                                        <p className="text-charcoal font-medium">{order.cancellationReason}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Customer Info */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-gray-50 flex items-center gap-3">

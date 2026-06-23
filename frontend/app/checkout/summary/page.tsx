@@ -138,17 +138,35 @@ export default function CheckoutSummaryPage() {
                         }
                     },
                     modal: {
-                        ondismiss: () => {
+                        ondismiss: async () => {
                             setIsPlacingOrder(false);
                             setError('Payment was cancelled. Please try again.');
+                            try {
+                                await fetch(`${BASE_URL}/api/payments/razorpay/fail`, {
+                                    method: 'POST',
+                                    headers,
+                                    body: JSON.stringify({ orderId: createData.orderId })
+                                });
+                            } catch (e) {
+                                console.error('Failed to notify backend of payment cancellation', e);
+                            }
                         },
                     },
                 };
 
                 const rzp = new (window as any).Razorpay(rzpOptions);
-                rzp.on('payment.failed', (response: any) => {
+                rzp.on('payment.failed', async (response: any) => {
                     setIsPlacingOrder(false);
                     setError(response?.error?.description || 'Payment failed. Please try again.');
+                    try {
+                        await fetch(`${BASE_URL}/api/payments/razorpay/fail`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify({ orderId: createData.orderId })
+                        });
+                    } catch (e) {
+                        console.error('Failed to notify backend of payment failure', e);
+                    }
                 });
                 rzp.open();
                 // Razorpay returns early; handler / modal callbacks reset isPlacingOrder

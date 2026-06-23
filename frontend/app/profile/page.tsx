@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Link from 'next/link';
-import { LogOut, User, Package, MapPin, X, ChevronDown } from 'lucide-react';
+import { LogOut, User, Package, MapPin, X, ChevronDown, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getAuthorizedHeaders } from '@/lib/auth';
 import { validatePhone, formatPhoneAsYouType } from '@/lib/phoneValidation';
@@ -19,6 +19,32 @@ export default function ProfilePage() {
     
     // Profile Edit State
     const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+
+    const getOrderStatusMessage = (order: any) => {
+        switch (order.status) {
+            case 'PENDING': return 'Order received';
+            case 'PROCESSING': return 'We are preparing your order';
+            case 'SHIPPED': return 'Your order is on the way';
+            case 'OUT_FOR_DELIVERY': return 'Your order is out for delivery';
+            case 'DELIVERED': return 'Order delivered successfully';
+            case 'RETURN_INITIATED': {
+                const approvedReturn = order.requests?.find((req: any) => req.type === 'RETURN' && req.status === 'APPROVED');
+                if (approvedReturn) {
+                    return 'Return Initiated • Return pickup will be arranged shortly.';
+                }
+                return 'Return Initiated';
+            }
+            case 'RETURN_COLLECTED': return 'Return product collected successfully. We are processing your refund amount.';
+            case 'REFUND_PROCESSING': return 'We are processing your refund amount.';
+            case 'REFUND_COMPLETED': return 'Refund Completed • Amount refunded successfully.';
+            case 'CANCELLED': 
+                if (order.refundStatus === 'PENDING' || order.refundStatus === 'COMPLETED') {
+                    return 'Order Cancelled • Refund Initiated • Amount will be credited within 2–3 working days';
+                }
+                return 'Order Cancelled';
+            default: return order.status;
+        }
+    };
     const [isSavingProfile, setIsSavingProfile] = useState(false);
     const [profileFormData, setProfileFormData] = useState({
         firstName: '',
@@ -359,9 +385,10 @@ export default function ProfilePage() {
                                                     order.status === 'DELIVERED' ? 'bg-green-50 text-green-700' :
                                                     order.status === 'SHIPPED' ? 'bg-blue-50 text-blue-700' :
                                                     order.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
+                                                    order.status === 'RETURN_INITIATED' ? 'bg-purple-50 text-purple-700' :
                                                     'bg-orange-50 text-orange-700'
                                                 }`}>
-                                                    {order.status}
+                                                    {getOrderStatusMessage(order)}
                                                 </span>
                                             </div>
                                             <div className="space-y-1 text-right">
@@ -404,6 +431,17 @@ export default function ProfilePage() {
                                                 />
                                             </div>
                                         )}
+
+                                        {/* Help Button */}
+                                        <div className="mt-6 pt-5 border-t border-gray-100 flex justify-end">
+                                            <Link
+                                                href={`/order-help/${order.id}`}
+                                                className="flex items-center gap-2 text-[13px] text-gray-500 hover:text-black font-medium transition-colors group"
+                                            >
+                                                <HelpCircle className="w-4 h-4 group-hover:text-black transition-colors" />
+                                                Need help with this order?
+                                            </Link>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -754,9 +792,10 @@ function OrderTracking({ awbCode, courierName, shipmentStatus }: { awbCode: stri
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-semibold ${
-                                    trackingData.tracking_data.track_status === 1 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                    trackingData.tracking_data.shipment_status === 7 ? 'bg-green-100 text-green-700' : 
+                                    trackingData.tracking_data.shipment_status === 9 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                                 }`}>
-                                    {trackingData.tracking_data.track_status === 1 ? 'Delivered' : trackingData.tracking_data.shipment_status || shipmentStatus || 'In Transit'}
+                                    {trackingData.tracking_data.shipment_track?.[0]?.current_status || 'In Transit'}
                                 </span>
                                 {trackingData.tracking_data.etd && (
                                     <span className="text-[13px] text-gray-600 font-medium ml-auto">
