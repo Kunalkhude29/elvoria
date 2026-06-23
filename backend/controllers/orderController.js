@@ -166,7 +166,19 @@ const updateOrderStatus = async (req, res) => {
     const orderId = Number(req.params.id);
 
     // Validate status
-    const validStatuses = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_INITIATED', 'RETURN_COLLECTED', 'REFUND_PROCESSING', 'REFUND_COMPLETED'];
+    const validStatuses = [
+        'PENDING', 
+        'PROCESSING', 
+        'SHIPPED', 
+        'OUT_FOR_DELIVERY', 
+        'DELIVERED', 
+        'RETURN_INITIATED', 
+        'RETURN_COLLECTED', 
+        'REFUND_PROCESSING', 
+        'REFUND_COMPLETED', 
+        'PAYMENT_FAILED', 
+        'CANCELLED'
+    ];
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: 'Invalid status' });
     }
@@ -188,61 +200,55 @@ const updateOrderStatus = async (req, res) => {
             updateData.deliveredAt = new Date();
         }
 
-        // Check if the order is moving into a status that requires stock deduction
-        const isNewFulfillment = (status === 'SHIPPED' || status === 'DELIVERED') &&
-            (currentOrder.status !== 'SHIPPED' && currentOrder.status !== 'DELIVERED');
+        const wasActive = ['PENDING', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURN_INITIATED', 'RETURN_COLLECTED', 'REFUND_PROCESSING', 'REFUND_COMPLETED'].includes(currentOrder.status);
+        const isActive = ['PENDING', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURN_INITIATED', 'RETURN_COLLECTED', 'REFUND_PROCESSING', 'REFUND_COMPLETED'].includes(status);
 
-        // Check if the order is moving backwards from fulfilled to unfulfilled
-        const isCancellation = (status === 'PENDING' || status === 'CANCELLED') &&
-            (currentOrder.status === 'SHIPPED' || currentOrder.status === 'DELIVERED');
+        // If moving from Active to Failed/Cancelled, restore stock
+        const isCancellation = wasActive && !isActive;
 
+        // If moving from Failed/Cancelled back to Active, deduct stock
+        const isReactivation = !wasActive && isActive;
 
-        if (isNewFulfillment) {
-
-            // Start an interactive transaction because we need to loop arrays
+        if (isReactivation) {
             await prisma.$transaction(async (tx) => {
-                // Update Order Status
+                // Verify and decrement stock
+                for (const item of currentOrder.items) {
+                    const product = await tx.product.findUnique({ where: { id: item.productId } });
+                    if (!product) {
+                        throw new Error(`Product not found.`);
+                    }
+                    if (product.stock < item.quantity) {
+                        throw new Error(`Only ${product.stock} items left in stock for ${product.name}`);
+                    }
+
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: { stock: { decrement: item.quantity } },
+                    });
+                }
+
                 const updatedOrder = await tx.order.update({
                     where: { id: orderId },
                     data: updateData
                 });
-
-                // Iterate over all purchased items
-                for (const item of currentOrder.items) {
-                    await tx.product.update({
-                        where: { id: item.productId },
-                        data: {
-                            stock: {
-                                decrement: item.quantity
-                            }
-                        }
-                    });
-                }
                 res.json(updatedOrder);
             });
-
         } else if (isCancellation) {
-
-            // Refund the stock items back to the parent product
             await prisma.$transaction(async (tx) => {
                 const updatedOrder = await tx.order.update({
                     where: { id: orderId },
                     data: updateData
                 });
 
+                // Restore stock
                 for (const item of currentOrder.items) {
                     await tx.product.update({
                         where: { id: item.productId },
-                        data: {
-                            stock: {
-                                increment: item.quantity
-                            }
-                        }
+                        data: { stock: { increment: item.quantity } },
                     });
                 }
                 res.json(updatedOrder);
             });
-
         } else {
             // Normal update without stock changes
             const order = await prisma.order.update({
@@ -254,7 +260,8 @@ const updateOrderStatus = async (req, res) => {
 
     } catch (error) {
         console.error('Error updating order:', error);
-        res.status(500).json({ message: 'Error updating order status' });
+        const statusCode = error.message?.includes('left in stock') || error.message?.includes('not found') ? 400 : 500;
+        res.status(statusCode).json({ message: error.message || 'Error updating order status' });
     }
 };
 
@@ -302,7 +309,7 @@ const getMyOrderById = async (req, res) => {
             }
         });
 
-        if (!order || order.userId !== req.user.id) {
+        if (!order || order.userId !== req.user.id || order.status === 'PAYMENT_FAILED') {
             return res.status(404).json({ message: 'Order not found' });
         }
 

@@ -258,6 +258,18 @@ export default function CheckoutDrawer() {
                 const createData = await createRes.json();
                 if (!createRes.ok) throw new Error(createData.message || 'Failed to initiate payment');
 
+                const handlePaymentFailure = async (orderId: number) => {
+                    try {
+                        await fetch(`${BASE_URL}/api/payments/razorpay/fail`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify({ orderId }),
+                        });
+                    } catch (err) {
+                        console.error('Error marking payment as failed:', err);
+                    }
+                };
+
                 const rzpOptions = {
                     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || createData.razorpayKey,
                     amount: createData.amount,
@@ -303,15 +315,17 @@ export default function CheckoutDrawer() {
                         }
                     },
                     modal: {
-                        ondismiss: () => {
+                        ondismiss: async () => {
                             setPlacingOrder(false);
+                            await handlePaymentFailure(createData.orderId);
                         },
                     },
                 };
 
                 const rzp = new (window as any).Razorpay(rzpOptions);
-                rzp.on('payment.failed', (response: any) => {
+                rzp.on('payment.failed', async (response: any) => {
                     setPlacingOrder(false);
+                    await handlePaymentFailure(createData.orderId);
                     alert(response?.error?.description || 'Payment failed. Please try again.');
                 });
                 rzp.open();
