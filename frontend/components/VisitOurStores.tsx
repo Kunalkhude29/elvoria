@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const stores = [
     {
@@ -100,18 +101,28 @@ export default function VisitOurStores() {
                         onMouseLeave={handleDragEnd}
                         style={{ userSelect: 'none' }}
                     >
-                        {/* We use a key on the image element so React reloads it when the src changes */}
-                        <img 
-                            key={activeStore.image}
-                            src={activeStore.image} 
-                            alt={`Store located in ${activeStore.title}`}
-                            draggable="false"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10 pointer-events-none"
-                        />
+                        {stores.map((store, index) => (
+                            <div
+                                key={store.id}
+                                className={`absolute inset-0 transition-opacity duration-700 ${
+                                    index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                                }`}
+                            >
+                                <Image 
+                                    src={store.image} 
+                                    alt={`Store located in ${store.title}`}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority={index === 0}
+                                    draggable="false"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+                                />
+                            </div>
+                        ))}
                         {/* Fallback overlay if image hasn't loaded or isn't uploaded yet */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-0">
                             <span className="text-sm font-outfit tracking-widest text-gray-400 uppercase text-center px-4">
-                                Waiting for image:<br/><b className="lowercase">{activeStore.image}</b>
+                                Loading store images...
                             </span>
                         </div>
                     </div>
