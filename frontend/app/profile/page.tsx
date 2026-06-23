@@ -695,7 +695,7 @@ function OrderTracking({ awbCode, courierName, shipmentStatus }: { awbCode: stri
         setIsExpanded(true);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shiprocket/track/${awbCode}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shipping/track/${awbCode}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

@@ -24,7 +24,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             const headers = await getAuthorizedHeaders({
                 'Content-Type': 'application/json'
             });
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shiprocket/order/${resolvedParams.id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shipping/order/${resolvedParams.id}`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(shipData)

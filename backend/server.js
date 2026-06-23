@@ -65,7 +65,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/pincode', pincodeRoutes);
 app.use('/api/homepage-images', homepageImageRoutes);
-app.use('/api/shiprocket', shiprocketRoutes);
+app.use('/api/shipping', shiprocketRoutes);
 
 // Make uploads folder manually accessible statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

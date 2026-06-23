@@ -35,7 +35,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         if (!deliveryPincode || deliveryPincode.length !== 6) return;
         setIsCheckingPincode(true);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shiprocket/serviceability?pincode=${deliveryPincode}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/shipping/serviceability?pincode=${deliveryPincode}`);
             if (res.ok) {
                 const data = await res.json();
                 setDeliveryEstimate(data);
