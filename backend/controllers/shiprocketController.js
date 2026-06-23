@@ -23,8 +23,8 @@ const pushOrderToShiprocket = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        if (order.awbCode) {
-            return res.status(400).json({ message: 'Shipment already created for this order.' });
+        if (order.awbCode || order.shiprocketOrderId) {
+            return res.status(400).json({ message: 'Order has already been pushed to Shiprocket.' });
         }
 
         // 2. Format Custom Order Payload
@@ -102,7 +102,7 @@ const pushOrderToShiprocket = async (req, res) => {
 // @access  Public
 const webhook = async (req, res) => {
     try {
-        const { awb, current_status } = req.body;
+        const { awb, current_status, order_id, courier_name } = req.body;
         
         // Shiprocket sends a header `x-api-key` which you can optionally verify
         
@@ -110,10 +110,20 @@ const webhook = async (req, res) => {
             return res.status(400).json({ message: 'Invalid payload' });
         }
 
-        // Find the order with this AWB and update its shipment status
-        const order = await prisma.order.findFirst({
-            where: { awbCode: awb }
-        });
+        // Find the order with this shiprocketOrderId
+        let order = null;
+        if (order_id) {
+            order = await prisma.order.findFirst({
+                where: { shiprocketOrderId: Number(order_id) }
+            });
+        }
+        
+        if (!order) {
+            // Fallback to awbCode if order_id is missing
+            order = await prisma.order.findFirst({
+                where: { awbCode: awb }
+            });
+        }
 
         if (order) {
             let appStatus = order.status;
@@ -129,7 +139,9 @@ const webhook = async (req, res) => {
                 where: { id: order.id },
                 data: {
                     shipmentStatus: current_status,
-                    status: appStatus
+                    status: appStatus,
+                    awbCode: awb,
+                    ...(courier_name && { courierName: courier_name })
                 }
             });
         }

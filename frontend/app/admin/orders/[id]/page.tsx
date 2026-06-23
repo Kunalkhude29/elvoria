@@ -131,6 +131,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         <span className="text-[10px] bg-gray-100 text-gray-500 font-bold px-3 py-2 rounded-lg font-outfit uppercase tracking-widest border border-gray-200">
                             Shipment Created
                         </span>
+                    ) : order.shiprocketOrderId ? (
+                        <span className="text-[10px] bg-indigo-50 text-indigo-500 font-bold px-3 py-2 rounded-lg font-outfit uppercase tracking-widest border border-indigo-100 flex items-center gap-2">
+                            <Send className="w-3 h-3" /> Sent to Shiprocket
+                        </span>
                     ) : (
                         <button 
                             onClick={() => setShowShipModal(true)}
