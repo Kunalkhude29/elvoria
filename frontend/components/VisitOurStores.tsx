@@ -7,27 +7,30 @@ const stores = [
         id: 1,
         title: "Shweta One Gram Gold, Karad",
         address: "Near Bank of India, Raviwar Peth,\nKarad, Maharashtra 415110",
-        link: "https://www.google.com/maps/place/17%C2%B017'17.8%22N+74%C2%B010'47.5%22E/@17.288369,74.1798954,3a,75y,267.77h,99.63t/data=!3m7!1e1!3m5!1soSigSNnATd784rHEmXamUg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D-9.627333716489588%26panoid%3DoSigSNnATd784rHEmXamUg%26yaw%3D267.76821361862426!7i16384!8i8192!4m4!3m3!8m2!3d17.2882786!4d74.179863?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
+        link: "https://www.google.com/maps/place/Shweta+one+gram+Gold,+KARAD/@17.2881971,74.1797995,17z/data=!3m1!4b1!4m6!3m5!1s0x3bc18300657005a9:0xa57b041a13f4f374!8m2!3d17.2881971!4d74.1797995!16s%2Fg%2F11vyl_xrc3?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
         image: "/images/store-image-1.jpeg"
     },
     {
         id: 2,
         title: "Shweta One Gram Gold, Satara",
         address: "Near Shete Chowk, Lokmat Building,\nSatara, Maharashtra 415002",
-        link: "https://www.google.com/maps/place/42b,+Khalcha+Rasta,+Shete+Chowk,+Rajeshpura+Peth,+Satara,+Maharashtra+415002/@17.6866756,73.9958657,3a,75y,347.01h,96.57t/data=!3m7!1e1!3m5!1sg3KxtPa-EQ-cKxyQL_mKtQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D-6.566404013423892%26panoid%3Dg3KxtPa-EQ-cKxyQL_mKtQ%26yaw%3D347.00968702075403!7i16384!8i8192!4m15!1m8!3m7!1s0x3bc239976e218cc1:0xf18af08b48ce87cd!2s42b,+Khalcha+Rasta,+Shete+Chowk,+Rajeshpura+Peth,+Satara,+Maharashtra+415002!3b1!8m2!3d17.686479!4d73.9957608!16s%2Fg%2F11vsjlvf9r!3m5!1s0x3bc239976e218cc1:0xf18af08b48ce87cd!8m2!3d17.686479!4d73.9957608!16s%2Fg%2F11vsjlvf9r?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
+        link: "https://www.google.com/maps/place/Shweta+One+Gram+Gold+Satara/data=!4m2!3m1!1s0x0:0x6e6284c670ee333c?sa=X&ved=1t:2428&ictx=111",
         image: "/images/store-image-2.jpeg"
     },
     {
         id: 3,
         title: "Shweta One Gram Gold, Ishwarpur",
         address: "Gandhi Chowk, Opposite to Bombay Tailor,\nIshwarpur, Maharashtra 415409",
-        link: "https://www.google.com/maps/dir//SHWETA+ONE+GRAM+GOLD,+27X8%2BR22,+Gandhi+Chowk,+Urun-Ishwarpur,+Maharashtra+415409/@18.5139471,73.806616,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3bc17500494a4fc7:0xd7172961cbc18215!2m2!1d74.2651111!2d17.0494722?hl=en-GB&authuser=0&entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
+        link: "https://www.google.com/maps/place/SHWETA+ONE+GRAM+GOLD,+ishwarpur/@17.0494386,74.2650749,17z/data=!4m6!3m5!1s0x3bc17500494a4fc7:0xd7172961cbc18215!8m2!3d17.0494386!4d74.2650749!16s%2Fg%2F11zg6_4890?hl=en-GB&entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D",
         image: "/images/store-image-3.jpeg"
     }
 ];
 
 export default function VisitOurStores() {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [touchStartX, setTouchStartX] = useState(0);
+    const [touchEndX, setTouchEndX] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
 
     const nextStore = () => setCurrentIndex((prev) => (prev + 1) % stores.length);
     const prevStore = () => setCurrentIndex((prev) => (prev === 0 ? stores.length - 1 : prev - 1));
@@ -37,6 +40,43 @@ export default function VisitOurStores() {
         const timer = setInterval(nextStore, 5000);
         return () => clearInterval(timer);
     }, []);
+
+    const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setIsDragging(true);
+        if ('touches' in e) {
+            setTouchStartX(e.touches[0].clientX);
+        } else {
+            setTouchStartX((e as React.MouseEvent).clientX);
+        }
+    };
+
+    const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
+        if (!isDragging) return;
+        if ('touches' in e) {
+            setTouchEndX(e.touches[0].clientX);
+        } else {
+            setTouchEndX((e as React.MouseEvent).clientX);
+        }
+    };
+
+    const handleDragEnd = () => {
+        setIsDragging(false);
+        if (!touchStartX || !touchEndX) return;
+        
+        const distance = touchStartX - touchEndX;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe) {
+            nextStore();
+        } else if (isRightSwipe) {
+            prevStore();
+        }
+        
+        // Reset values
+        setTouchStartX(0);
+        setTouchEndX(0);
+    };
 
     const activeStore = stores[currentIndex];
 
@@ -49,13 +89,24 @@ export default function VisitOurStores() {
                 
                 <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
                     {/* Image Section */}
-                    <div className="w-full md:w-1/2 aspect-[4/5] md:aspect-square bg-gray-50 overflow-hidden shadow-sm relative group">
+                    <div 
+                        className="w-full md:w-1/2 aspect-[4/5] md:aspect-square bg-gray-50 overflow-hidden shadow-sm relative group cursor-grab active:cursor-grabbing"
+                        onTouchStart={handleDragStart}
+                        onTouchMove={handleDragMove}
+                        onTouchEnd={handleDragEnd}
+                        onMouseDown={handleDragStart}
+                        onMouseMove={handleDragMove}
+                        onMouseUp={handleDragEnd}
+                        onMouseLeave={handleDragEnd}
+                        style={{ userSelect: 'none' }}
+                    >
                         {/* We use a key on the image element so React reloads it when the src changes */}
                         <img 
                             key={activeStore.image}
                             src={activeStore.image} 
                             alt={`Store located in ${activeStore.title}`}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10"
+                            draggable="false"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10 pointer-events-none"
                         />
                         {/* Fallback overlay if image hasn't loaded or isn't uploaded yet */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-0">
