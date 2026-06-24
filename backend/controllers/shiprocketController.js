@@ -81,10 +81,11 @@ const pushOrderToShiprocket = async (req, res) => {
         // 4. Auto-Generate AWB (Find cheapest courier and assign)
         const deliveryPincode = order.shippingZip || '000000';
         const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || '415110';
+        const isCod = order.paymentMethod === 'COD' ? 1 : 0;
         
         let courierId = null;
         try {
-            const serviceResponse = await shiprocket.checkServiceability(pickupPincode, deliveryPincode, Number(weight), 0);
+            const serviceResponse = await shiprocket.checkServiceability(pickupPincode, deliveryPincode, Number(weight), isCod);
             if (serviceResponse.status === 200 && serviceResponse.data && serviceResponse.data.available_courier_companies && serviceResponse.data.available_courier_companies.length > 0) {
                 const couriers = serviceResponse.data.available_courier_companies;
                 const cheapestCourier = couriers.sort((a, b) => a.rate - b.rate)[0];
