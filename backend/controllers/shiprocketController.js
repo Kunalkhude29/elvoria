@@ -78,55 +78,18 @@ const pushOrderToShiprocket = async (req, res) => {
         const srOrderId = srOrderResponse.order_id;
         const srShipmentId = srOrderResponse.shipment_id;
 
-        // 4. Auto-Generate AWB (Find cheapest courier and assign)
-        const deliveryPincode = order.shippingZip || '000000';
-        const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || '415110';
-        const isCod = order.paymentMethod === 'COD' ? 1 : 0;
-        
-        let courierId = null;
-        try {
-            const serviceResponse = await shiprocket.checkServiceability(pickupPincode, deliveryPincode, Number(weight), isCod);
-            if (serviceResponse.status === 200 && serviceResponse.data && serviceResponse.data.available_courier_companies && serviceResponse.data.available_courier_companies.length > 0) {
-                const couriers = serviceResponse.data.available_courier_companies;
-                const cheapestCourier = couriers.sort((a, b) => a.rate - b.rate)[0];
-                courierId = cheapestCourier.courier_company_id;
-            }
-        } catch (err) {
-            console.log("Serviceability check failed, falling back to default courier auto-assign.", err.message);
-        }
-
-        let awbCode = null;
-        let courierName = null;
-        
-        try {
-            const awbResponse = await shiprocket.generateAWB(srShipmentId, courierId);
-            if (awbResponse.response && awbResponse.response.data && awbResponse.response.data.awb_code) {
-                awbCode = awbResponse.response.data.awb_code;
-                courierName = awbResponse.response.data.courier_name;
-            }
-        } catch (err) {
-            console.error("Failed to auto-generate AWB:", err.message);
-        }
-
-        // 5. Update DB
+        // 4. Update DB (Order is now in "New" tab in Shiprocket)
         const updatedOrder = await prisma.order.update({
             where: { id: orderId },
             data: {
                 shiprocketOrderId: srOrderId,
                 shiprocketShipmentId: srShipmentId,
-                ...(awbCode && { awbCode }),
-                ...(courierName && { courierName }),
-                shipmentStatus: awbCode ? 'AWB Generated' : 'Processing',
-                status: awbCode ? 'SHIPPED' : 'PENDING',
+                shipmentStatus: 'Processing', // Still waiting for seller to manually assign courier in Shiprocket
                 shipmentCreatedAt: new Date(),
             }
         });
 
-        if (awbCode) {
-            res.json({ message: `Success! Order pushed and AWB ${awbCode} generated automatically.`, order: updatedOrder });
-        } else {
-            res.json({ message: 'Order pushed to Shiprocket, but auto-AWB failed. Please assign courier manually in Shiprocket dashboard.', order: updatedOrder });
-        }
+        res.json({ message: 'Order pushed to Shiprocket successfully. Please assign a courier in the Shiprocket dashboard.', order: updatedOrder });
 
     } catch (error) {
         console.error('Push to Shiprocket Error:', error);
