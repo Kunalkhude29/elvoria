@@ -38,7 +38,9 @@ export default function TrendingSection() {
                 const filter = activeFilter;
                 const filtered =
                     filter === 'Trending'
-                        ? _cachedAllProducts!
+                        ? _cachedAllProducts!.filter(
+                              (p: any) => p.collection?.toLowerCase() === 'trending'
+                          )
                         : _cachedAllProducts!.filter(
                               (p: any) =>
                                   p.category?.toLowerCase() === filter.toLowerCase() ||
