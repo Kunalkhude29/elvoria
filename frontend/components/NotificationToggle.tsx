@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getAuthorizedHeaders } from '@/lib/api';
+import { getAuthorizedHeaders } from '@/lib/auth';
 
 const urlBase64ToUint8Array = (base64String: string) => {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
