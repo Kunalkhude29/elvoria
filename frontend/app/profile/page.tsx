@@ -9,7 +9,6 @@ import { useAuth } from '@/context/AuthContext';
 import { getAuthorizedHeaders } from '@/lib/auth';
 import { validatePhone, formatPhoneAsYouType } from '@/lib/phoneValidation';
 import { fetchPincodeDetails } from '@/lib/pincode';
-import NotificationToggle from '@/components/NotificationToggle';
 
 export default function ProfilePage() {
     const { user, loading, signOut, refreshProfile } = useAuth();
@@ -488,8 +487,6 @@ export default function ProfilePage() {
                                     </div>
                                 )}
                             </div>
-
-                            <NotificationToggle />
 
                             {/* Addresses Box */}
                             <div className="bg-white rounded-xl p-8 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
