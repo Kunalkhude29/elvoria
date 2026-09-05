@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingBag, Minus, Plus, Loader2, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import { useCart } from '../context/CartContext';
@@ -22,6 +22,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     const [isAdding, setIsAdding] = useState(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const pathname = usePathname();
+    const router = useRouter();
 
     const [similarProducts, setSimilarProducts] = useState<any[]>([]);
     const carouselRef = useRef<HTMLDivElement>(null);
@@ -166,6 +167,26 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                 quantity: quantity
             });
             openCart();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsAdding(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        setIsAdding(true);
+        try {
+            await addToCart({
+                id: PRODUCT.id,
+                name: PRODUCT.name,
+                price: PRODUCT.price,
+                image: PRODUCT.image,
+                category: PRODUCT.category,
+                stock: PRODUCT.stock ?? 10,
+                quantity: quantity
+            });
+            router.push('/checkout');
         } catch (error) {
             console.error(error);
         } finally {
@@ -371,6 +392,20 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                                 <Heart className="w-6 h-6" fill={isWished ? 'currentColor' : 'none'} />
                             </button>
                         </div>
+                        <button
+                            onClick={handleBuyNow}
+                            disabled={isAdding || isOutOfStock}
+                            className={`w-full py-3.5 bg-black text-white font-outfit text-sm font-bold tracking-wider uppercase transition-colors hover:bg-gray-800 flex justify-center items-center gap-2 ${isAdding || isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isAdding ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <span>Processing...</span>
+                                </>
+                            ) : (
+                                <span>Buy Now</span>
+                            )}
+                        </button>
                     </div>
 
                     {/* Addl Info */}

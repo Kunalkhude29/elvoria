@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Package, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
 import { getAuthorizedHeaders } from '@/lib/auth';
+import NotificationToggle from '@/components/NotificationToggle';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -51,6 +52,8 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-outfit font-bold text-charcoal">Dashboard Overview</h1>
             </div>
+            
+            <NotificationToggle />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {statCards.map((card, idx) => (

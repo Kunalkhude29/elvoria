@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { validatePhone } = require('../utils/phoneValidation');
 const { validatePincode } = require('../utils/pincodeValidation');
+const { notifyNewOrder } = require('../services/notificationService');
 
 // Initialise Razorpay with TEST MODE credentials
 const razorpay = new Razorpay({
@@ -209,6 +210,9 @@ const verifyRazorpayPayment = async (req, res) => {
             },
         });
 
+        // Trigger notifications asynchronously
+        notifyNewOrder(updatedOrder.id).catch(err => console.error("Notification error:", err));
+
         return res.status(200).json({ success: true, orderId: updatedOrder.id });
     } catch (err) {
         console.error('[PAYMENT] verifyRazorpayPayment error:', err);
@@ -310,6 +314,9 @@ const createCODOrder = async (req, res) => {
                 razorpayPaymentId: null,
             });
         });
+
+        // Trigger notifications asynchronously
+        notifyNewOrder(order.id).catch(err => console.error("Notification error:", err));
 
         return res.status(201).json({ orderId: order.id, order });
     } catch (err) {

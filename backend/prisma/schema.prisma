@@ -49,6 +49,7 @@ model Profile {
   role           Role      @default(USER)
   orders         Order[]
   addresses      Address[]
+  pushSubscriptions PushSubscription[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -139,6 +140,7 @@ model Order {
 
   items               OrderItem[]
   requests            OrderRequest[]
+  notificationLogs    NotificationLog[]
 
   // Cancellation and Refund Tracking
   cancelledBy         String?     // "CUSTOMER" | "ADMIN"
@@ -242,4 +244,28 @@ model OrderRequest {
   updatedAt DateTime      @updatedAt
 
   @@map("order_requests")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid()) @db.Uuid
+  profileId String   @db.Uuid
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model NotificationLog {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  type      String   // 'ORDER_CONFIRMED' or 'NEW_ORDER'
+  createdAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, type])
 }
