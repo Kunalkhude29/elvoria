@@ -395,7 +395,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                         <button
                             onClick={handleBuyNow}
                             disabled={isAdding || isOutOfStock}
-                            className={`w-full py-3.5 bg-black text-white font-outfit text-sm font-bold tracking-wider uppercase transition-colors hover:bg-gray-800 flex justify-center items-center gap-2 ${isAdding || isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`w-full btn-primary flex items-center justify-center space-x-2 transition-all duration-300 ${isAdding || isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isAdding ? (
                                 <>
