@@ -5,14 +5,14 @@ const path = require('path');
 const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
-    const filetypes = /jpg|jpeg|png|webp/;
+    const filetypes = /jpg|jpeg|png|webp|heic|heif/i;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
 
     if (extname && mimetype) {
         return cb(null, true);
     } else {
-        cb(new Error('Images only!'));
+        cb(new Error(`Images only! Got ext: ${path.extname(file.originalname)}, mime: ${file.mimetype}`));
     }
 }
 
