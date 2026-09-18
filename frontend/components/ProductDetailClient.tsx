@@ -502,7 +502,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             )}
 
             {/* Customer Reviews Section */}
-            <CustomerReviews />
+            <CustomerReviews productId={initialProduct.id} />
 
             {/* Toast Notification */}
             <AnimatePresence>
