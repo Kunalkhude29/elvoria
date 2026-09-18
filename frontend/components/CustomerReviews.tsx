@@ -22,6 +22,7 @@ export default function CustomerReviews({ productId }: { productId: number }) {
     const [isLoading, setIsLoading] = useState(true);
     const [sort, setSort] = useState('Most Recent');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const { profile } = useAuth();
     
     // Writing Review State
@@ -431,7 +432,11 @@ export default function CustomerReviews({ productId }: { productId: number }) {
                                     {review.images && review.images.length > 0 && (
                                         <div className="flex gap-2 ml-11 mb-4 mt-2 overflow-x-auto pb-2">
                                             {review.images.map((img, idx) => (
-                                                <div key={idx} className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 border border-gray-200">
+                                                <div 
+                                                    key={idx} 
+                                                    onClick={() => setSelectedImage(img)}
+                                                    className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                                >
                                                     <Image src={img} alt="Review image" fill className="object-cover" />
                                                 </div>
                                             ))}
@@ -468,6 +473,29 @@ export default function CustomerReviews({ productId }: { productId: number }) {
                     </>
                 )}
             </div>
+
+            {/* Image Lightbox Modal */}
+            {selectedImage && (
+                <div 
+                    className="fixed inset-0 z-[100] bg-black bg-opacity-90 flex items-center justify-center p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 text-white hover:text-gray-300 transition-colors"
+                        onClick={() => setSelectedImage(null)}
+                    >
+                        <X className="w-8 h-8" />
+                    </button>
+                    <div className="relative w-full max-w-4xl h-[80vh]" onClick={(e) => e.stopPropagation()}>
+                        <Image 
+                            src={selectedImage} 
+                            alt="Full size review image" 
+                            fill 
+                            className="object-contain" 
+                        />
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
