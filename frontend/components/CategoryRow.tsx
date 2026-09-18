@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const CATEGORIES = [
+    { name: 'Men',       slug: 'men',       defaultImage: '/images/product-2.png', href: '/men' },
     { name: 'Necklaces', slug: 'necklaces', defaultImage: '/images/product-3.png', href: '/necklaces' },
     { name: 'Earrings',  slug: 'earrings',  defaultImage: '/images/product-1.png', href: '/earrings' },
     { name: 'Rings',     slug: 'rings',     defaultImage: '/images/product-4.png', href: '/rings' },

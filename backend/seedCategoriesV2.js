@@ -18,6 +18,7 @@ async function main() {
         { name: 'Daily Wear', image: '/images/product-1.png' },
         { name: 'Gifting', image: '/images/product-2.png' },
         // Trending Section Categories
+        { name: 'Men', image: null },
         { name: 'Rings', image: null },
         { name: 'Necklaces', image: null },
         { name: 'Bangles', image: null },
