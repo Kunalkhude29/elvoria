@@ -95,9 +95,37 @@ const deleteReview = async (req, res) => {
     }
 };
 
+// @desc    Vote on a review
+// @route   POST /api/reviews/:id/vote
+// @access  Public
+const voteReview = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const { type } = req.body; // 'helpful' or 'notHelpful'
+
+        if (type === 'helpful') {
+            await prisma.review.update({
+                where: { id },
+                data: { helpfulCount: { increment: 1 } }
+            });
+        } else if (type === 'notHelpful') {
+            await prisma.review.update({
+                where: { id },
+                data: { notHelpfulCount: { increment: 1 } }
+            });
+        }
+
+        res.json({ message: 'Vote recorded' });
+    } catch (error) {
+        console.error("Error voting on review:", error);
+        res.status(500).json({ message: 'Failed to record vote' });
+    }
+};
+
 module.exports = {
     getProductReviews,
     createReview,
     checkReviewEligibility,
-    deleteReview
+    deleteReview,
+    voteReview
 };

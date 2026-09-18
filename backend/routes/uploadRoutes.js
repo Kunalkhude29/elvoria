@@ -30,7 +30,8 @@ const handleUpload = async (file) => {
                          
     if (hasCloudinary) {
         const result = await uploadFromBuffer(file.buffer, 'elvoria');
-        return result.secure_url;
+        // Add f_auto,q_auto to the URL so HEIC and other formats are automatically converted to webp/jpg for browsers
+        return result.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
     } else {
         console.warn('[UPLOAD] Cloudinary credentials missing in .env, falling back to local file storage.');
         return saveToLocalDisk(file);

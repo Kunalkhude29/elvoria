@@ -140,6 +140,43 @@ export default function CustomerReviews({ productId }: { productId: number }) {
         }
     };
 
+    const handleVote = async (id: number, type: 'helpful' | 'notHelpful') => {
+        const votedReviews = JSON.parse(localStorage.getItem('votedReviews') || '{}');
+        if (votedReviews[id]) {
+            alert('You have already voted on this review.');
+            return;
+        }
+
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+            const res = await fetch(`${apiUrl}/api/reviews/${id}/vote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ type })
+            });
+
+            if (res.ok) {
+                votedReviews[id] = type;
+                localStorage.setItem('votedReviews', JSON.stringify(votedReviews));
+                
+                setReviews(reviews.map(r => {
+                    if (r.id === id) {
+                        return {
+                            ...r,
+                            helpfulCount: type === 'helpful' ? r.helpfulCount + 1 : r.helpfulCount,
+                            notHelpfulCount: type === 'notHelpful' ? r.notHelpfulCount + 1 : r.notHelpfulCount
+                        };
+                    }
+                    return r;
+                }));
+            }
+        } catch (error) {
+            console.error('Voting error', error);
+        }
+    };
+
     const submitReview = async (e: React.FormEvent) => {
         e.preventDefault();
         if (rating === 0) {
@@ -415,11 +452,11 @@ export default function CustomerReviews({ productId }: { productId: number }) {
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button className="flex items-center gap-1.5 hover:text-black transition-colors">
+                                            <button onClick={() => handleVote(review.id, 'helpful')} className="flex items-center gap-1.5 hover:text-black transition-colors">
                                                 <ThumbsUp className="w-4 h-4" />
                                                 <span className="text-xs font-outfit">{review.helpfulCount}</span>
                                             </button>
-                                            <button className="flex items-center gap-1.5 hover:text-black transition-colors">
+                                            <button onClick={() => handleVote(review.id, 'notHelpful')} className="flex items-center gap-1.5 hover:text-black transition-colors">
                                                 <ThumbsDown className="w-4 h-4" />
                                                 <span className="text-xs font-outfit">{review.notHelpfulCount}</span>
                                             </button>
