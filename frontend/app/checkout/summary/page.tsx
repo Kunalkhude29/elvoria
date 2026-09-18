@@ -75,7 +75,7 @@ export default function CheckoutSummaryPage() {
                     quantity: item.quantity,
                     price: item.price,
                 })),
-                totalPrice: cartTotal,
+                totalPrice: paymentMethod === 'cod' ? cartTotal + 100 : cartTotal,
             };
 
             // ── UPI / Online payment via Razorpay (TEST MODE) ───────────────
@@ -297,7 +297,11 @@ export default function CheckoutSummaryPage() {
                                         </div>
                                         <div className="text-left">
                                             <p className="font-outfit font-semibold font-bold text-charcoal">Cash on Delivery</p>
-                                            <p className="text-xs text-charcoal/40 font-outfit">Pay when you receive your order</p>
+                                            {paymentMethod === 'cod' ? (
+                                                <p className="text-xs text-amber-600 font-medium font-outfit mt-0.5">Inc. ₹100.00 COD charges</p>
+                                            ) : (
+                                                <p className="text-xs text-charcoal/40 font-outfit">Pay when you receive your order</p>
+                                            )}
                                         </div>
                                     </div>
                                     {paymentMethod === 'cod' && <CheckCircle2 className="w-6 h-6 text-gold" />}
@@ -366,9 +370,15 @@ export default function CheckoutSummaryPage() {
                                     <span>Shipping</span>
                                     <span className="text-green-600 font-bold uppercase tracking-wider text-[10px]">Free</span>
                                 </div>
+                                {paymentMethod === 'cod' && (
+                                    <div className="flex justify-between text-sm text-amber-600 font-outfit font-medium">
+                                        <span>COD Charges</span>
+                                        <span>₹100</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-lg font-outfit font-semibold font-bold text-charcoal pt-4 border-t border-dashed border-gray-200">
                                     <span>Total Payable</span>
-                                    <span>₹{cartTotal}</span>
+                                    <span>₹{paymentMethod === 'cod' ? cartTotal + 100 : cartTotal}</span>
                                 </div>
                             </div>
                         </div>

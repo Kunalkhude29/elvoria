@@ -235,7 +235,7 @@ export default function CheckoutDrawer() {
                     quantity: item.quantity,
                     price: item.price
                 })),
-                totalPrice: cartTotal,
+                totalPrice: paymentMethod === 'COD' ? cartTotal + 100 : cartTotal,
                 customerName: `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || formData.fullName,
                 customerPhone: profile?.phone || profile?.addresses?.[0]?.phone || formData.phone,
                 customerEmail: profile?.email || email,
@@ -633,10 +633,15 @@ export default function CheckoutDrawer() {
                                                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${paymentMethod === 'COD' ? 'border-amber-600' : 'border-gray-300'}`}>
                                                     {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 bg-amber-600 rounded-full" />}
                                                 </div>
-                                                <span className="font-bold text-charcoal font-outfit font-semibold">Cash on Delivery</span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-charcoal font-outfit font-semibold">Cash on Delivery</span>
+                                                    {paymentMethod === 'COD' && (
+                                                        <span className="text-xs text-amber-600 font-medium font-outfit mt-0.5">Inc. ₹100.00 COD charges</span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <div className="text-sm font-bold text-charcoal font-outfit font-semibold">₹{cartTotal.toFixed(2)}</div>
+                                                <div className="text-sm font-bold text-charcoal font-outfit font-semibold">₹{(paymentMethod === 'COD' ? cartTotal + 100 : cartTotal).toFixed(2)}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -650,7 +655,7 @@ export default function CheckoutDrawer() {
                                     >
                                         {placingOrder ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                                             <>
-                                                <span className="font-bold uppercase tracking-widest text-xs">Place Order • ₹{cartTotal.toFixed(2)}</span>
+                                                <span className="font-bold uppercase tracking-widest text-xs">Place Order • ₹{(paymentMethod === 'COD' ? cartTotal + 100 : cartTotal).toFixed(2)}</span>
                                                 <CheckCircle2 className="w-4 h-4" />
                                             </>
                                         )}
